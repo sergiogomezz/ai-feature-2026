@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#65c9bd"><meta name="robots" content="noindex,nofollow"><title>feature</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<section id="christmas-envelope" aria-label="Felicitación de Navidad">
+<div class="envelope-snow" aria-hidden="true">✦</div>
+<button id="open-envelope" class="envelope" aria-label="Abrir el sobre: Feliz Navidad">
+<span class="envelope-letter"><span>Feliz Navidad</span><small>✧</small></span><span class="envelope-back"></span><span class="envelope-front"></span><span class="envelope-flap"></span><span class="envelope-seal">✦</span><span class="envelope-greeting">Feliz Navidad</span>
+</button><p id="envelope-status" role="status"></p>
+</section>
+<main inert>
+<h1 class="sr-only">El regalo de María</h1><span id="chapter" class="sr-only"></span>
+<div class="controls"><button id="sound" aria-label="Activar música" title="Activar música" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17V5l10-2v12M10 8l10-2"/><ellipse cx="7" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/><path class="music-slash" d="M3 3l18 18"/></svg></button><button id="reset" aria-label="Volver a empezar" title="Volver a empezar">↺</button></div>
+<div id="world"><div id="fallback" class="fallback"><span>★</span><div class="tree-shape"></div><button id="fallback-parcel" class="fallback-box" aria-label="Abrir el regalo de María">🎁</button></div><button id="parcel" class="sr-only" aria-label="Abrir el regalo de María">Para María</button><button id="window-entry" class="sr-only" aria-label="Saltar por la ventana">Saltar por la ventana</button><div id="stars" hidden><button class="hidden-star star-one" aria-label="Encontrar primera estrella">★</button><button class="hidden-star star-two" aria-label="Encontrar segunda estrella">★</button><button class="hidden-star star-three" aria-label="Encontrar tercera estrella">★</button></div></div>
+<div class="bottom"><p id="instruction" class="sr-only"></p><div class="search-tools"><p id="progress" role="status" aria-live="polite"></p><button id="hint" class="quiet" hidden>¿Una pista?</button></div></div>
+</main>
+<dialog id="letter" aria-labelledby="letter-title"><button id="close-letter" class="close" aria-label="Cerrar la nota">×</button><div class="paper"><span class="paper-star" aria-hidden="true">✦</span><h2 id="letter-title">¡Aquí no cabe<br>tu regalo!</h2><p>Encuentra las <strong>3 estrellas</strong><br>y te cuento más…</p><button id="search" class="primary">¡Voy! <span aria-hidden="true">↗</span></button></div></dialog>
+<dialog id="discovery" aria-labelledby="discovery-title"><div class="paper"><span class="paper-star" aria-hidden="true">✦</span><p>Nos vamos a…</p><h2 id="discovery-title">¡Barcelona!</h2><p class="small">Continuará…</p><button id="back" class="primary">Volver <span aria-hidden="true">↗</span></button></div></dialog>
+<noscript><p class="noscript">Activa JavaScript para abrir el regalo.</p></noscript>
+<script type="module" src="app.js"></script></body></html>
