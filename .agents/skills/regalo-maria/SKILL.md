@@ -7,20 +7,20 @@ description: Diseñar e iterar la web de Reyes para María de este proyecto, man
 
 Esta skill conserva la dirección creativa y técnica de un proyecto en evolución. El usuario ha pedido mantener las ideas en skills actualizables y trabajar por iteraciones.
 
-## Antes de diseñar o implementar
+## Retomar con poco contexto
 
-- Leer [Dirección creativa](references/experiencia.md): distingue requisitos del usuario de propuestas todavía abiertas.
-- Consultar [Herramientas](references/herramientas.md) para elegir animación, 3D, recursos o vídeo; contiene fuentes y límites de la investigación.
-- Para modificar escenas o transiciones, leer [Arquitectura y animación](references/arquitectura.md).
-- Leer [Estado e iteraciones](references/estado.md) y contrastarlo con los archivos reales antes de continuar. No confundir una propuesta o investigación con una función implementada.
+1. Leer primero [Estado actual](references/estado.md): resumen compacto, verificación y punto de continuación.
+2. Para código, consultar [Arquitectura](references/arquitectura.md). Para decisiones de experiencia, [Dirección creativa](references/experiencia.md).
+3. Consultar [Herramientas](references/herramientas.md), [recursos y prompts del final](references/final-assets.md) o `scripts/VIDEO.md` solo si se va a cambiar esa parte. No cargar el historial de investigación por defecto.
+4. Contrastar siempre la memoria con el código real. Una propuesta o investigación no equivale a implementación.
 
 ## Cómo avanzar
 
-Trabajar en una porción visible y jugable cada vez, manteniendo un recorrido que pueda revisarse. El primer tramo ya funciona: sobre → llegada de Reyes → regalo → estrellas → Barcelona. Continuar desde el estado comprobado. No migrar todo el proyecto ni añadir varios motores solo porque estén en la lista de candidatos.
+Trabajar en una porción visible y jugable cada vez, manteniendo un recorrido que pueda revisarse. El primer tramo ya funciona: sobre → llegada de Reyes → regalo → cinco caras de María a huevazos por la habitación → bola del mundo brillante en el árbol → Tierra/Palau → vídeo y dos tarjetas. Continuar desde el estado comprobado. No migrar todo el proyecto ni añadir varios motores solo porque estén en la lista de candidatos.
 
 El regalo debe funcionar en móvil y escritorio. Evitar que una animación, el audio bloqueado por el navegador o una pista difícil impidan llegar al final: ofrecer ayuda, controles de audio y alternativa con movimiento reducido. La llegada de los Reyes no lleva botón de saltar, por petición explícita. Mantener el título del navegador exactamente `feature`. Son criterios de implementación propuestos, no decisiones estéticas del usuario.
 
-Conservar los datos exactos de la compra. Los billetes decorativos no son entradas válidas: no inventar asientos, códigos QR ni datos de acceso. El vídeo final todavía no existe; una recreación con IA debe identificarse como tal y no presentarse como un saludo auténtico del artista.
+Conservar los datos exactos de la compra. Los billetes decorativos no son entradas válidas: no inventar asientos, códigos QR ni datos de acceso. Existe una primera recreación de vídeo generada localmente con voz sintética original; consultar estado, herramientas y recursos del final. Identificarla como IA y no presentarla como saludo auténtico ni como voz clonada del artista. No contratar servicios de pago; las entradas reales permanecen privadas con el usuario.
 
 ## Mantener la memoria
 

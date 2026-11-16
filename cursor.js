@@ -9,11 +9,12 @@ function clear() {
   previous = undefined;
 }
 function hover(target) {
+  if(root.classList.contains('egg-aim')) { clear(); return; }
   const control = target instanceof Element && target.closest('button, a[href], [role="button"], [data-clickable="true"]');
   root.classList.toggle('cucumber-hover', Boolean(control && !control.matches(':disabled, [aria-disabled="true"]') && !control.closest('[inert]')));
 }
 document.addEventListener('pointermove', event => {
-  if (!fine.matches || event.pointerType === 'touch') { clear(); return; }
+  if (root.classList.contains('egg-aim') || !fine.matches || event.pointerType === 'touch') { clear(); return; }
   hover(event.target);
   if (!previous || Math.hypot(event.clientX - previous.x, event.clientY - previous.y) > 0) {
     root.classList.add('cucumber-moving');

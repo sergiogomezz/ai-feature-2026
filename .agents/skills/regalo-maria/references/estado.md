@@ -1,34 +1,44 @@
-# Estado actual
+# Estado actual y continuación
 
-Actualizado: 2026-11-16.
+Actualizado: 2026-11-16. Memoria compactada tras la última petición del usuario; este archivo sustituye el historial cronológico de iteraciones.
 
-## Implementado
+## Recorrido vigente
 
-Primer tramo jugable con Vite, Three.js y Anime.js:
+Sobre «Feliz Navidad» que se agita → abrir solapa → tarjeta «Para María» sale y espera clic → Reyes borrachos en perros salchicha → regalo → nota → cinco caras de María a huevazos por la misma habitación → aparece una bola del mundo brillante en el árbol → clic en esa bola → dos vueltas al planeta, parada orientada a Barcelona y acercamiento → Palau → vídeo de escenario → dos tarjetas decorativas.
 
-- Sobre «Feliz Navidad» en cada recarga. Al abrirlo aparece la habitación y los Reyes Magos entregan el regalo montados en perros salchicha. No hay botón para saltar.
-- Llegada de unos 21,1 segundos: 7 de entrada, 7,2 de caída cómica del Rey central y vuelta a su montura, 1,7 de entrega y 5,2 de salida. Personajes articulados, balanceo de borrachera, botellas y reacciones de los perros.
-- Habitación 3D con materiales físicos, reflejos locales, madera, papel y tejidos procedurales, abeto con 252 ramas y 20.160 agujas instanciadas, luces cálidas y ventana azul. Actuación de dibujos animados; no es fotorrealismo terminado.
-- Regalo hueco: tapa que se aparta y cámara que entra dentro antes de mostrar la nota. Cerrar la nota devuelve la cámara. Ventana interactiva con caída entre nubes y retorno provisional a la habitación.
-- Nota, búsqueda de tres estrellas, ayuda, pista Barcelona y reinicio. Sin cabecera, pie ni bocadillo «Ábreme». Se abre desde el regalo, también con teclado.
-- Cursor de pepino con cara: sonrisa en reposo, grito al moverse, mayor tamaño en elementos clicables. Solo puntero fino; también funciona en diálogos, sin sonido propio.
-- Música original con Web Audio, opcional, nota tachada al silenciar y pausa al ocultar la pestaña.
-- Título de pestaña `feature`. Movimiento reducido, controles de teclado y alternativa CSS si falla WebGL. Reiniciar reinicia las pistas; recargar repite el sobre. Sin persistencia.
+**Último cambio solicitado:** la bola debe ser un adorno nuevo del árbol, sin diálogo de Barcelona. El mundo gira dos vueltas antes de centrarse; no hay punto amarillo y el zoom no debe mostrar píxeles. No añadir nuevos minijuegos, regenerar vídeo ni cambiar el resto del recorrido para esta iteración.
 
-El prototipo anterior con revelación, mapa y calendario está en `archive/`, fuera del build. El recorrido actual termina en Barcelona. No hay vídeo final, viaje al Palau ni despliegue.
+## Implementación y límites
 
-## Verificación realizada
+- Vite + Three.js + Anime.js. Sobre en DOM; habitación y personajes 3D con materiales físicos. No es fotorrealismo terminado.
+- La solapa abre antes de salir la tarjeta. Dos botones hermanos, sin botones anidados. La tarjeta espera clic o Enter.
+- Llegada de Reyes de unos 21,1 s, caída cómica visible, sin botón de saltar. Regalo bloqueado hasta terminar.
+- Cámara entra en caja hueca antes de mostrar nota. Cerrar nota restaura cámara. Ventana conserva una caída provisional con retorno a la habitación.
+- Cinco recortes de `public/maria-head-cutout.png` repartidos en paredes/cuadro/ventana. Mano articulada, preparación y liberación de huevo, vuelo, impactos por raycasting, clara/yema/cáscaras y goteo. Cinco aciertos únicos; los fallos manchan sin sumar. Ayuda y teclado reencuadran pendientes; arrastrar no dispara.
+- Al acabar, `world.revealGlobe()` hace aparecer un adorno Tierra con casquillo, brillo y halo azul en el árbol. `tree-globe` es su botón proyectado; también hay raycasting y alternativa CSS. El viaje no empieza hasta pulsarlo.
+- `finale.js`: dos vueltas exactas (4π, 6,5 s) y luego 3 s de acercamiento acotado. Textura Tierra 8192×4096 de Solar System Scope, CC BY 4.0, crédito visible. Se elimina marcador/punto/anillo amarillo del planeta. El aumento de la foto aérea se limita según sus píxeles disponibles; no se promete zoom cartográfico continuo. Viaje total 19 s.
+- Final aéreo y escenario son recreaciones de ImageGen. El vídeo se generó localmente con LTX-2.3 Q4/MLX: 768×448, 97 frames/24 fps, 4,04 s, H.264/AAC, unos 450 KB. Sostiene dos tarjetas y acerca una a cámara; la web completa las dos tarjetas con texto legible.
+- Frase: «María… tengo una cosina para ti». Voz **sintética original** de macOS Eddy en español, no clonada de Quevedo. Etiqueta visible de IA. No existe permiso para reproducir la voz exacta del artista.
+- Dos tarjetas: «ENTRADA PARA QUEVEDO» y «Martes, 6 de julio de 2027». Palau Sant Jordi · Barcelona fuera de tarjetas. Sin QR, asientos, sector ni códigos. Las entradas reales permanecen privadas con el usuario.
+- Pausa superior detiene CSS, esperas, gestos, vuelo/goteo, viaje y vídeo. Reinicio cancela y limpia; recargar repite sobre. Sonido opcional; música original Web Audio, volumen reducido durante saludo. Alternativa de movimiento reducido: vistas estáticas y paso al vídeo, sin giro ni zoom rápido.
+- Título de navegador exactamente `feature`. Sin persistencia ni despliegue.
 
-Build correcto. Comprobados escritorio y móvil emulado 390×844 sin desbordamiento; apertura, nota, estrellas, descubrimiento, reinicio y control musical. Verificados cámara dentro del regalo, caída de ventana y retorno, cancelación por reinicio, cursor expresivo y título. Última revisión de la llegada: ausencia de botón para saltar, Rey caído visible en el suelo y continuidad hasta abrir el regalo.
+## Trabajo local y revisión
 
-Limitaciones: audio sin evaluación de oído, rendimiento sin medir en teléfono físico. Módulo 3D de unos 214 kB gzip; Vite advierte del tamaño descomprimido superior a 500 kB.
+- Carpeta de trabajo: `/Users/sergiogomez/orca/workspaces/regalo-maria-2026/video`.
+- Servidor usado: **http://127.0.0.1:4175/**. El 4174 corresponde a otra carpeta/servidor; no confundirlos.
+- `?preview=finale` solo en desarrollo: deja la bola del árbol desbloqueada. Vite elimina el atajo del build de producción.
+- Cierre solicitado por el usuario: commit, push e integración en `main`, borrar la rama `video` una vez integrada. Esta carpeta se conserva con los modelos y queda en HEAD separado al borrar su rama. Para seguir aquí mañana, crear una rama nueva desde `main` antes de hacer commits; el checkout principal de `main` está en `/Users/sergiogomez/Repos/cosas-random/regalo-maria-2026`.
+- `npm run build`. Browser de Orca mediante skill `orca-cli`; no guardar IDs de pestaña/terminal.
+- `.local-video/` está ignorado por Git y fuera del build: herramientas y unos 27 GB de modelos locales ya descargados. No volver a descargar ni instalar si no hace falta. No se ha contratado ningún servicio de vídeo de pago.
+- Para vídeo: [recursos/prompts](final-assets.md) y `scripts/VIDEO.md`. Para otras ediciones: [arquitectura](arquitectura.md). Decisiones de usuario: [experiencia](experiencia.md).
 
-## Siguientes iteraciones propuestas
+## Verificación
 
-1. Afinar el ambiente y la actuación con feedback del usuario.
-2. Definir las siguientes pistas/minijuegos y conectarlas sin revelar Quevedo antes de tiempo.
-3. Probar el acercamiento Tierra–Barcelona–Palau; elegir 3D estilizado, geográfico o vídeo.
-4. Ensayar una recreación identificada como IA para el final antes de integrar un MP4.
-5. Revisar experiencia completa, móvil físico, audio y publicación.
+Previo a esta iteración: recorrido completo hasta dos tarjetas en escritorio 1280×800 y móvil emulado 390×844; vídeo real decodificado y revisado en fotogramas; reproducción, activar sonido, pausa con `currentTime` congelado, fin/revelación y reinicio sin acciones tardías comprobados. Título `feature`. Build correcto.
 
-Las herramientas investigadas siguen siendo candidatas salvo Three.js, Anime.js y Web Audio. Consultar arquitectura para modificar las secuencias sin romper bloqueo, cancelación o cámara.
+Última iteración: build correcto; textura comprobada 8192×4096. Recorrido real hasta terminar cinco caras: aparece el adorno en el árbol, cero diálogos abiertos, viaje todavía oculto. Clic real en el adorno inicia el viaje; contador de giro llega exactamente a 2, se detiene con rótulo Barcelona, pausa congela el giro. Captura del planeta revisada sin marcador amarillo. Continúa hasta el MP4 sin error y las dos tarjetas. No se ha repetido prueba en teléfono físico, fallo WebGL forzado ni evaluación de oído.
+
+## Próximo paso
+
+Revisión del usuario de esta transición. Mantener presupuesto cero y entradas auténticas privadas. La voz exacta de Quevedo sigue sin hacerse; no sustituir la voz original por clonación sin autorización. No reabrir investigación de herramientas ni regenerar recursos si el siguiente pedido es solo de interfaz o animación.

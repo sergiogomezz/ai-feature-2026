@@ -2,11 +2,13 @@ import * as THREE from 'three';
 import { animate } from 'animejs';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { createFinale } from './finale.js';
+import { createEggGame } from './egg-game.js';
 import { createRoyalArrival } from './royal-arrival.js';
 import { surfaceTexture, addFir } from './materials.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-export function createWorld(container, {onGift, isWrapped, canOpenGift, reduced}) {
+export function createWorld(container, {onGift, onGlobe, isWrapped, canOpenGift, reduced}) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#282d2b');
   const camera = new THREE.PerspectiveCamera(36, 1, .1, 80);
@@ -124,13 +126,35 @@ export function createWorld(container, {onGift, isWrapped, canOpenGift, reduced}
   const rail=mesh(new THREE.CylinderGeometry(.025,.025,3.9,12),gold,3,5.22,-2.9);rail.rotation.z=Math.PI/2;
   const royal=createRoyalArrival(scene);
   let arrivalActive=false;
+  const treeGlobe=new THREE.Group();treeGlobe.name='tree-world-ornament';tree.add(treeGlobe);treeGlobe.position.set(.88,2.65,1.02);treeGlobe.visible=false;
+  const globeMap=new THREE.TextureLoader().load('/ending/earth.jpg');globeMap.colorSpace=THREE.SRGBColorSpace;
+  const globeBall=new THREE.Mesh(new THREE.SphereGeometry(.3,40,28),new THREE.MeshPhysicalMaterial({map:globeMap,roughness:.32,metalness:.05,clearcoat:.65,emissive:'#254d75',emissiveIntensity:.12}));treeGlobe.add(globeBall);
+  const globeCap=new THREE.Mesh(new THREE.CylinderGeometry(.065,.075,.07,16),gold);globeCap.position.y=.32;treeGlobe.add(globeCap);
+  const globeHook=new THREE.Mesh(new THREE.TorusGeometry(.048,.009,6,20),gold);globeHook.position.y=.39;treeGlobe.add(globeHook);
+  const globeGlow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowMap,color:'#86cbff',transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.7}));globeGlow.scale.set(1.45,1.45,1);globeGlow.position.z=-.2;treeGlobe.add(globeGlow);
+  const globeLight=new THREE.PointLight('#9cdbff',1.8,2.5,2);treeGlobe.add(globeLight);
+  const globeButton=document.getElementById('tree-globe');let globeUnlocked=false,globeBorn=0;
+  function revealGlobe(){globeUnlocked=true;globeBorn=animationTime;treeGlobe.visible=true;treeGlobe.scale.setScalar(reduced.matches?1:.01);globeButton.hidden=false;}
+  function hideGlobe(){globeUnlocked=false;treeGlobe.visible=false;globeButton.hidden=true;}
+  function updateGlobe(){
+    if(!globeUnlocked||!treeGlobe.visible)return;
+    const appear=reduced.matches?1:THREE.MathUtils.smoothstep(animationTime-globeBorn,0,1200);treeGlobe.scale.setScalar(Math.max(.01,appear));
+    globeBall.rotation.y=-Math.PI/2+(reduced.matches?0:Math.sin(animationTime*.0005)*.2);globeGlow.material.opacity=reduced.matches?.75:.62+Math.sin(animationTime*.002)*.17;
+    scene.updateMatrixWorld();camera.updateMatrixWorld();
+    const point=treeGlobe.getWorldPosition(new THREE.Vector3());const center=point.clone().project(camera);const edge=point.clone().add(new THREE.Vector3(.34,0,0)).project(camera);
+    const size=Math.max(48,Math.abs(edge.x-center.x)*container.clientWidth);
+    Object.assign(globeButton.style,{left:`${(center.x+1)*container.clientWidth/2}px`,top:`${(1-center.y)*container.clientHeight/2}px`,width:`${size}px`,height:`${size}px`});
+    globeButton.disabled=paused||busy;
+  }
+  let eggGame, finale;
   let animations=[], cancelWait=[], sequence=0, busy=false, inside=false;
+  let paused=false, lastFrame=null, animationTime=0;
   let renderScene=scene;
   const veil=document.createElement('div');veil.className='travel-veil';veil.setAttribute('aria-hidden','true');container.append(veil);
   const look=new THREE.Vector3();
   const savedPosition=new THREE.Vector3(), savedTarget=new THREE.Vector3();
   function tween(target, values, duration, ease='inOutCubic'){
-    return new Promise(resolve=>{cancelWait.push(()=>resolve(false));animations.push(animate(target,{...values,duration:reduced.matches?0:duration,ease,onComplete:()=>resolve(true)}));});
+    return new Promise(resolve=>{cancelWait.push(()=>resolve(false));animations.push(animate(target,{...values,autoplay:!paused,duration:reduced.matches?0:duration,ease,onComplete:()=>resolve(true)}));});
   }
   function begin(kind){
     busy=true;controls.enabled=false;container.dataset.travel=kind;
@@ -141,7 +165,7 @@ export function createWorld(container, {onGift, isWrapped, canOpenGift, reduced}
   }
   function restore(){
     renderScene=scene;camera.position.copy(savedPosition);camera.up.set(0,1,0);camera.fov=36;camera.updateProjectionMatrix();
-    controls.target.copy(savedTarget);camera.lookAt(controls.target);controls.enabled=true;controls.update();
+    controls.target.copy(savedTarget);camera.lookAt(controls.target);controls.minAzimuthAngle=-.4;controls.maxAzimuthAngle=.7;controls.enabled=!paused;controls.update();
     veil.style.opacity='0';busy=false;inside=false;delete container.dataset.travel;container.classList.remove('travelling');
   }
   function cancel(){sequence++;animations.forEach(a=>a.pause());animations=[];cancelWait.forEach(resolve=>resolve());cancelWait=[];}
@@ -168,7 +192,7 @@ export function createWorld(container, {onGift, isWrapped, canOpenGift, reduced}
   const streaks=[];
   for(let i=0;i<26;i++){const line=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,1.5,4),new THREE.MeshBasicMaterial({color:'#e8ffff'}));line.position.set(Math.sin(i*3)*6,20-i*3,-7-Math.cos(i)*3);sky.add(line);streaks.push(line);}
   async function fall(){
-    if(busy||document.querySelector('dialog[open]'))return;
+    if(paused||busy||document.querySelector('dialog[open]'))return;
     const id=begin('window');veil.style.background='#8ddff2';
     if(!await Promise.all([tween(camera.position,{x:3,y:3.5,z:-1.8},900),tween(look,{x:3,y:3.5,z:-8},900),tween(veil,{opacity:1},950,'inCubic')]).then(r=>r.every(Boolean))||id!==sequence)return;
     renderScene=sky;container.dataset.travel='falling';camera.position.set(0,19,2);look.set(0,15,-12);camera.fov=58;camera.updateProjectionMatrix();
@@ -200,20 +224,40 @@ export function createWorld(container, {onGift, isWrapped, canOpenGift, reduced}
     if(!await tween(royal.motion,{exit:1},5200,'inOutSine')||id!==sequence)return;
     finishArrival();
   }
-  function reset(){if(arrivalActive)finishArrival();cancel();if(busy||inside)restore();lid.position.set(0,.91,0);lid.rotation.set(0,0,0);controls.reset();}
+  function stopEggGame(){if(eggGame?.active){eggGame.stop();restore();}}
+  function startEggGame(callbacks){
+    returnToRoom();
+    begin('egg-game');
+    if(!eggGame)eggGame=createEggGame({canvas:renderer.domElement,container,reduced,scene,camera,focusTarget(position){
+      camera.position.set(position.x*.65,position.y+1.2,position.z+9);controls.target.copy(position);controls.update();
+    }});
+    camera.fov=camera.aspect<.8?48:40;camera.updateProjectionMatrix();
+    camera.position.set(2.7,5.8,camera.aspect<.8?15:12.8);controls.target.set(0,2.6,-1);
+    controls.minAzimuthAngle=-1.2;controls.maxAzimuthAngle=1.2;controls.enabled=!paused;controls.update();
+    eggGame.setPaused(paused);eggGame.start(callbacks);
+    container.classList.remove('travelling');
+  }
+  function stopFinale(){if(finale?.active){finale.stop();restore();}}
+  function startFinale(callbacks){
+    stopEggGame();returnToRoom();begin('finale');
+    container.classList.remove('travelling');
+    if(!finale)finale=createFinale({renderer,container,reduced,...callbacks});
+    finale.setPaused(paused);finale.start();
+  }
+  function reset(){hideGlobe();stopFinale();stopEggGame();if(arrivalActive)finishArrival();cancel();if(busy||inside)restore();lid.position.set(0,.91,0);lid.rotation.set(0,0,0);controls.reset();}
   let pointerStart;
   const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();
   renderer.domElement.addEventListener('pointermove',event=>{
     const r=renderer.domElement.getBoundingClientRect();
     pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);
     ray.setFromCamera(pointer,camera);
-    const clickable=!busy && ((canOpenGift() && ray.intersectObject(gift,true).length>0) || ray.intersectObject(win,true).length>0);
+    const clickable=!paused && !busy && ((globeUnlocked&&ray.intersectObject(treeGlobe,true).length>0) || (canOpenGift() && ray.intersectObject(gift,true).length>0) || ray.intersectObject(win,true).length>0);
     renderer.domElement.dataset.clickable=String(clickable);
   });
   renderer.domElement.addEventListener('pointerleave',()=>{delete renderer.domElement.dataset.clickable;});
   renderer.domElement.addEventListener('pointerdown',e=>pointerStart={x:e.clientX,y:e.clientY});
-  renderer.domElement.addEventListener('click',e=>{if(busy||!pointerStart||Math.hypot(e.clientX-pointerStart.x,e.clientY-pointerStart.y)>8)return;const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);if(ray.intersectObject(gift,true).length)onGift();else if(ray.intersectObject(win,true).length)fall();});
-  function resize(){const {width,height}=container.getBoundingClientRect();camera.aspect=width/height;const distance=camera.aspect<.7?14.2:camera.aspect<1?12.2:10.5;if(busy){camera.updateProjectionMatrix();renderer.setSize(width,height);return;}camera.position.set(distance*.27,5.6,distance);controls.target.set(0,2.15,.15);camera.lookAt(controls.target);camera.updateProjectionMatrix();renderer.setSize(width,height);controls.update();controls.saveState();}
+  renderer.domElement.addEventListener('click',e=>{if(paused||busy||!pointerStart||Math.hypot(e.clientX-pointerStart.x,e.clientY-pointerStart.y)>8)return;const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);if(globeUnlocked&&ray.intersectObject(treeGlobe,true).length)onGlobe();else if(ray.intersectObject(gift,true).length)onGift();else if(ray.intersectObject(win,true).length)fall();});
+  function resize(){const {width,height}=container.getBoundingClientRect();camera.aspect=width/height;const distance=camera.aspect<.7?14.2:camera.aspect<1?12.2:10.5;if(busy){camera.updateProjectionMatrix();renderer.setSize(width,height);eggGame?.resize();return;}camera.position.set(distance*.27,5.6,distance);controls.target.set(0,2.15,.15);camera.lookAt(controls.target);camera.updateProjectionMatrix();renderer.setSize(width,height);controls.update();controls.saveState();}
   const observer=new ResizeObserver(resize);observer.observe(container);resize();
   renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();reset();renderer.setAnimationLoop(null);renderer.domElement.hidden=true;document.getElementById('fallback').hidden=false;});
   const giftButton=document.getElementById('parcel');
@@ -230,6 +274,11 @@ export function createWorld(container, {onGift, isWrapped, canOpenGift, reduced}
     giftButton.style.setProperty('--gift-left',`${left}px`);giftButton.style.setProperty('--gift-top',`${top}px`);
     giftButton.style.setProperty('--gift-width',`${right-left}px`);giftButton.style.setProperty('--gift-height',`${bottom-top}px`);
   }
-  renderer.setAnimationLoop(time=>{if(document.hidden)return;const t=time/1000;royal.update(t,reduced.matches);if(!reduced.matches){const beat=Math.max(0,Math.sin(t*2.3));if(isWrapped()&&!busy){gift.rotation.z=Math.sin(t*9)*beat**8*.07;gift.position.y=beat**16*.12;gift.scale.set(1+beat**16*.04,1-beat**16*.035,1);}topStar.rotation.y=.3+Math.sin(t)*.18;lights.forEach((l,i)=>l.scale.setScalar(.88+Math.sin(t*2+i)*.15));}else if(isWrapped()&&!busy){gift.position.y=0;gift.rotation.z=0;gift.scale.setScalar(1);}if(busy){camera.lookAt(look);}else controls.update();positionGiftFocus();renderer.render(renderScene,camera);});
-  return {open,reset,returnToRoom,playArrival,finishArrival,get busy(){return busy;}};
+  function setPaused(value){
+    paused=value;lastFrame=null;eggGame?.setPaused(value);finale?.setPaused(value);
+    animations.forEach(animation=>{if(!animation.completed) {if(paused)animation.pause();else animation.resume();}});
+    controls.enabled=!paused&&(!busy||Boolean(eggGame?.active));
+  }
+  renderer.setAnimationLoop(time=>{const delta=lastFrame===null?0:time-lastFrame;lastFrame=time;if(document.hidden||paused||finale?.active)return;if(eggGame?.active){controls.update();eggGame.update(delta);if(eggGame.active)renderer.render(scene,camera);return;}animationTime+=delta;const t=animationTime/1000;royal.update(t,reduced.matches);if(!reduced.matches){const beat=Math.max(0,Math.sin(t*2.3));if(isWrapped()&&!busy){gift.rotation.z=Math.sin(t*9)*beat**8*.07;gift.position.y=beat**16*.12;gift.scale.set(1+beat**16*.04,1-beat**16*.035,1);}topStar.rotation.y=.3+Math.sin(t)*.18;lights.forEach((l,i)=>l.scale.setScalar(.88+Math.sin(t*2+i)*.15));}else if(isWrapped()&&!busy){gift.position.y=0;gift.rotation.z=0;gift.scale.setScalar(1);}if(busy){camera.lookAt(look);}else controls.update();updateGlobe();positionGiftFocus();renderer.render(renderScene,camera);});
+  return {open,reset,revealGlobe,returnToRoom,playArrival,finishArrival,setPaused,startEggGame,stopEggGame,helpEggGame(){eggGame?.help();},startFinale,stopFinale,setFinaleSound(value){finale?.setSound(value);},get busy(){return busy;}};
 }
