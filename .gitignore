@@ -3,3 +3,9 @@ dist/
 .DS_Store
 
 .local-video/
+
+# Entorno Python y audios de trabajo
+.venv/
+__pycache__/
+output/*
+!output/.gitkeep

@@ -42,3 +42,9 @@ Previo a esta iteración: recorrido completo hasta dos tarjetas en escritorio 12
 ## Próximo paso
 
 Revisión del usuario de esta transición. Mantener presupuesto cero y entradas auténticas privadas. La voz exacta de Quevedo sigue sin hacerse; no sustituir la voz original por clonación sin autorización. No reabrir investigación de herramientas ni regenerar recursos si el siguiente pedido es solo de interfaz o animación.
+
+## Generador TTS estándar (2026-11-17)
+
+Petición vigente: preparar el entorno uv y TTS estándar. Añadidos `pyproject.toml`, `uv.lock`, `.venv` ignorado y `voice_generator.py`. Python 3.10/3.11; Edge TTS online con Álvaro español, rate -18%, pitch -12Hz configurables. Exporta WAV PCM16 mono 24 kHz a `output/final_voice.wav`, con temporales y publicación atómica. FFmpeg incluido vía imageio-ffmpeg; sin GPU ni modelos externos. Instrucciones en README. No modifica el MP4 del final. No hay inferencia RVC ni conversión de identidad vocal.
+
+Verificado: uv sync con Python 3.11 ARM64, ayuda CLI, rechazo de texto vacío y síntesis online real de prueba. WAV decodificado y comprobado PCM16 mono/24 kHz, con duración positiva. Sin evaluación de oído ni ejecución en Python 3.10. No se repite build web porque no cambia el código del navegador.

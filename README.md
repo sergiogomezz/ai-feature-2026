@@ -15,6 +15,18 @@ La escena Three.js y Anime.js se carga en un módulo separado; se puede arrastra
 
 El prototipo anterior (revelación, mapa y calendario) se conserva en `archive/`, fuera del build actual. No hay entradas reales, códigos de acceso ni publicación. El MP4 y las imágenes del final se sirven localmente; no hay servicios de vídeo de pago. El proceso de generación está documentado en [scripts/VIDEO.md](scripts/VIDEO.md). `noindex` no es control de acceso.
 
+## Generar narración TTS
+
+```sh
+uv sync --python 3.11
+uv run voice_generator.py "Hola, María. Feliz Navidad."
+uv run voice_generator.py "Tu texto" --voice es-ES-AlvaroNeural --rate=-18% --pitch=-12Hz
+```
+
+`uv sync` crea `.venv`; `uv run` lo utiliza sin activarlo manualmente. Proyecto Python independiente del entorno de vídeo MLX, compatible con Python 3.10/3.11. Dependencias reproducibles en `uv.lock`. La salida predeterminada es `output/final_voice.wav` (PCM16, mono, 24 kHz); `--output ruta.wav` permite cambiarla y reemplaza el archivo si existe. Sin argumento se usa una felicitación de prueba.
+
+La síntesis de [Edge TTS](https://github.com/rany2/edge-tts) necesita Internet y envía el texto a Microsoft. FFmpeg convierte el MP3 temporal a WAV en el Mac; su ejecutable viene con `imageio-ffmpeg`. No requiere GPU, MPS ni modelos de voz descargados. Los temporales se limpian y la salida anterior se conserva si falla la generación. `.venv` y los audios de `output/` están excluidos de Git. El audio se genera para revisión: no reemplaza automáticamente el sonido del vídeo.
+
 ## Memoria actualizable
 
 La [skill del proyecto](.agents/skills/regalo-maria/SKILL.md), también disponible como `$regalo-maria`, conserva:
