@@ -22,6 +22,14 @@ Regalo de Reyes para su novia María: una aventura web para descubrir unas entra
 - Al acabar los minijuegos aparece una nueva bola del mundo, más brillante que los demás adornos, colgada del árbol. El viaje solo empieza al pulsarla; no hay diálogo intermedio de Barcelona. El planeta da dos vueltas, se detiene orientado a Barcelona y se acerca sin pixelar. Sin punto amarillo (última decisión del 16 de noviembre).
 - No contratar herramientas ni servicios de pago para el vídeo. Viaje Tierra → acercamiento al Palau → escenario. Dos tarjetas decorativas que pongan entrada para Quevedo y la fecha del martes confirmado; las entradas auténticas se quedan privadas con el usuario (petición del 16 de noviembre).
 
+- Nueva decisión (17 de noviembre): al acabar los huevos, la ventana se abre y la cámara cae hacia otro minijuego sencillo de un pimiento volador pasando por aros. Implementación propuesta para esta revisión: seis aros amplios, tocar/espacio para subir, sin vidas ni pérdida de progreso, ayuda opcional y regreso al árbol al completarlo.
+
+- Último ajuste (17 de noviembre): acercamiento gradual desde el planeta hasta el Palau, sin esfumar el globo entero, y quitar textos innecesarios/«AI slop» en todo el recorrido. Mantener solo instrucciones, datos concretos y textos personales útiles.
+
+- Revisión local (18 de noviembre): opción ×2 junto a pausa para acelerar las animaciones mientras el usuario prueba la app. Control ×1/×2 implementado en desarrollo.
+
+- Corrección del 18 de noviembre: conservar la animación/vista aérea del Palau con Barcelona de fondo. El zoom geográfico debe desembocar en ella y después enlazar con el vídeo ya hecho; no eliminarla al mejorar el acercamiento.
+
 ## Datos de compra confirmados
 
 - Quevedo — El Baifo Tour.
@@ -38,7 +46,7 @@ Regalo de Reyes para su novia María: una aventura web para descubrir unas entra
 - Viaje Tierra → Europa → Barcelona → Montjuïc → Palau, mediante 3D o planos prerenderizados; cartografía en directo opcional.
 - Después del vídeo, fecha, recinto y dedicatoria, reutilizando mapa/calendario del prototipo.
 - Posible siguiente iteración del vídeo: pulir fidelidad facial, voz original y gesto de entrega según revisión del usuario. La primera versión local ya existe; consultar estado y recursos del final.
-- La caída de la ventana vuelve hoy a la habitación: solución provisional, aún sin enlace al Palau.
+- El minijuego del pimiento queda conectado al árbol al terminar; se puede revisar su dificultad y acabado.
 
 ## Pendiente de definir
 

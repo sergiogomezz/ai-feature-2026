@@ -16,7 +16,7 @@ Esta skill conserva la dirección creativa y técnica de un proyecto en evoluci�
 
 ## Cómo avanzar
 
-Trabajar en una porción visible y jugable cada vez, manteniendo un recorrido que pueda revisarse. El primer tramo ya funciona: sobre → llegada de Reyes → regalo → cinco caras de María a huevazos por la habitación → bola del mundo brillante en el árbol → Tierra/Palau → vídeo y dos tarjetas. Continuar desde el estado comprobado. No migrar todo el proyecto ni añadir varios motores solo porque estén en la lista de candidatos.
+Trabajar en una porción visible y jugable cada vez, manteniendo un recorrido que pueda revisarse. El primer tramo ya funciona: sobre → llegada de Reyes → regalo → cinco caras de María a huevazos por la habitación → ventana que se abre y caída → pimiento volador por seis aros → bola del mundo brillante en el árbol → Tierra/Palau → vídeo y dos tarjetas. Continuar desde el estado comprobado. No migrar todo el proyecto ni añadir varios motores solo porque estén en la lista de candidatos.
 
 El regalo debe funcionar en móvil y escritorio. Evitar que una animación, el audio bloqueado por el navegador o una pista difícil impidan llegar al final: ofrecer ayuda, controles de audio y alternativa con movimiento reducido. La llegada de los Reyes no lleva botón de saltar, por petición explícita. Mantener el título del navegador exactamente `feature`. Son criterios de implementación propuestos, no decisiones estéticas del usuario.
 

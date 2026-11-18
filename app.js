@@ -1,9 +1,11 @@
 import './cursor.js';
+import { getPlaybackRate, setPlaybackRate } from './playback.js';
 const $ = (id) => document.getElementById(id);
 let phase = 'envelope';
 let found = 0;
 let fallbackEggGame;
 let fallbackFinale;
+let fallbackPepperGame;
 let endingSpeaking=false;
 let world;
 let opening = 0;
@@ -18,7 +20,7 @@ function wait(duration) {
     const entry = {remaining: duration, start: 0, timer: null};
     entry.run = () => {
       entry.start = performance.now();
-      entry.timer = setTimeout(() => { waits.delete(entry); resolve(); }, entry.remaining);
+      entry.timer = setTimeout(() => { waits.delete(entry); resolve(); }, entry.remaining / getPlaybackRate());
     };
     waits.add(entry);
     if (!paused) entry.run();
@@ -30,7 +32,7 @@ function setPaused(value) {
   if (paused) {
     for (const entry of waits) {
       clearTimeout(entry.timer);
-      entry.remaining = Math.max(0, entry.remaining - (performance.now() - entry.start));
+      entry.remaining = Math.max(0, entry.remaining - (performance.now() - entry.start) * getPlaybackRate());
     }
     pausedTransitions = document.getAnimations().filter(animation => animation.playState === 'running');
     pausedTransitions.forEach(animation => animation.pause());
@@ -40,16 +42,41 @@ function setPaused(value) {
     waits.forEach(entry => entry.run());
   }
   document.documentElement.classList.toggle('animations-paused', paused);
-  world?.setPaused(paused);fallbackFinale?.setPaused(paused);
+  world?.setPaused(paused);fallbackFinale?.setPaused(paused);fallbackPepperGame?.setPaused(paused);
   $('pause').setAttribute('aria-pressed', String(paused));
   $('pause').setAttribute('aria-label', paused ? 'Reanudar animaciones' : 'Pausar animaciones');
   $('pause').title = paused ? 'Reanudar animaciones' : 'Pausar animaciones';
 }
 $('pause').addEventListener('click', () => setPaused(!paused));
+// Review speed is available in the local development toolbar.
+if(import.meta.env.DEV){
+  const speedButton=$('speed');speedButton.hidden=false;
+  const syncAnimations=()=>document.getAnimations().forEach(animation=>{
+    if(animation.playbackRate!==getPlaybackRate())animation.updatePlaybackRate(getPlaybackRate());
+  });
+  speedButton.addEventListener('click',()=>{
+    if(!paused)for(const entry of waits){
+      clearTimeout(entry.timer);
+      entry.remaining=Math.max(0,entry.remaining-(performance.now()-entry.start)*getPlaybackRate());
+    }
+    setPlaybackRate(getPlaybackRate()===1?2:1);
+    if(!paused)waits.forEach(entry=>entry.run());
+    syncAnimations();
+    speedButton.textContent=`×${getPlaybackRate()}`;
+    speedButton.setAttribute('aria-pressed',String(getPlaybackRate()===2));
+    const label=getPlaybackRate()===2?'Volver a velocidad normal':'Acelerar a velocidad doble';
+    speedButton.setAttribute('aria-label',label);speedButton.title=label;
+  });
+  let syncFrame;
+  // Catch CSS animations created later (envelope, clouds, tickets) without restarting them.
+  new MutationObserver(()=>{
+    cancelAnimationFrame(syncFrame);syncFrame=requestAnimationFrame(syncAnimations);
+  }).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','hidden']});
+}
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 function chime(notes) { music?.chime(notes); }
 async function openGift() {
-  if(paused || world?.busy || ['envelope','envelope-opening','card','arrival','travelling','reveal'].includes(phase))return;
+  if(paused || world?.busy || ['envelope','envelope-opening','card','arrival','window','flying','travelling','reveal'].includes(phase))return;
   if (phase === 'opening' || phase === 'searching') return;
   if (phase === 'complete') { $('tree-globe').focus({preventScroll:true}); return; }
   if (phase !== 'wrapped') { $('letter').showModal(); return; }
@@ -67,7 +94,6 @@ $('fallback-parcel').addEventListener('click', openGift);
 $('letter').addEventListener('close', () => world?.returnToRoom());
 $('close-letter').addEventListener('click', () => $('letter').close());
 function stopEggGame() {
-  $('window-entry').disabled = false;
   world?.stopEggGame(); fallbackEggGame?.stop(); fallbackEggGame = undefined;
 }
 function eggHit(count) {
@@ -76,16 +102,34 @@ function eggHit(count) {
   chime([440 + count * 90]);
   $('progress').textContent = `🥚 ${found} / 5`;
 }
-function eggComplete() {
+async function eggComplete() {
   if (phase !== 'searching') return;
-  stopEggGame(); phase = 'complete'; $('hint').hidden = true;
-  $('chapter').textContent = '03 / UNA BOLA DIFERENTE';
-  $('instruction').textContent = 'Una nueva bola brilla en el árbol.';
-  $('progress').textContent='';$('parcel').hidden=true;revealTreeGlobe();
+  stopEggGame();phase='window';$('hint').hidden=true;$('parcel').hidden=true;
+  $('chapter').textContent='03 / POR LA VENTANA';
+  $('instruction').textContent='La ventana se abre. ¡Allá vamos!';$('progress').textContent='';
+  const request=++opening;
+  const completed=world ? await world.fall() : await wait(reduced.matches?0:700).then(()=>true);
+  if(request!==opening||phase!=='window'||!completed)return;
+  phase='flying';$('instruction').textContent='Pasa por seis aros con el pimiento volador.';$('chapter').textContent='04 / UN PIMIENTO CON ALAS';
+  const callbacks={onComplete:pepperComplete,onScore:count=>chime([520+count*70])};
+  if(world)world.startPepperGame(callbacks);
+  else {
+    const {createPepperGame}=await import('./pepper-game.js');
+    if(request!==opening||phase!=='flying')return;
+    if(!fallbackPepperGame)fallbackPepperGame=createPepperGame({container:$('world'),reduced,...callbacks});
+    fallbackPepperGame.start();fallbackPepperGame.setPaused(paused);
+  }
+}
+function pepperComplete(){
+  if(phase!=='flying')return;
+  world?.stopPepperGame();fallbackPepperGame?.stop();phase='complete';
+  $('chapter').textContent='05 / UNA BOLA DIFERENTE';
+  $('instruction').textContent='Una nueva bola brilla en el árbol.';
+  $('progress').textContent='';revealTreeGlobe();$('tree-globe').focus({preventScroll:true});
 }
 $('search').addEventListener('click', async () => {
   $('letter').close(); world?.returnToRoom();
-  phase = 'searching'; $('parcel').hidden = true; $('window-entry').disabled = true;
+  phase = 'searching'; $('parcel').hidden = true;
   $('hint').hidden = false; $('chapter').textContent = '02 / A HUEVAZO LIMPIO';
   $('instruction').textContent = 'Busca las cinco caras por la habitación. Arrastra para mirar y pulsa para lanzar.';
   $('progress').textContent = '🥚 0 / 5';
@@ -106,8 +150,7 @@ function revealTreeGlobe(){
 }
 async function startFinale(){
   if(paused||phase!=='complete')return;
-  $('tree-globe').hidden=true;phase='travelling';$('parcel').hidden=true;$('window-entry').disabled=true;
-  $('progress').textContent='';
+  $('tree-globe').hidden=true;phase='travelling';$('parcel').hidden=true;  $('progress').textContent='';
   const callbacks={onReveal,onSpeaking,soundEnabled:()=>soundEnabled};
   if(world)world.startFinale(callbacks);
   else{
@@ -121,7 +164,7 @@ $('tree-globe').addEventListener('click',startFinale);
 $('reset').addEventListener('click', () => {
   setPaused(false);
   opening++; phase = 'wrapped'; found = 0;
-  $('letter').close();$('tree-globe').hidden=true;$('tree-globe').classList.remove('globe-fallback'); fallbackFinale?.stop();world?.reset();
+  $('letter').close();$('tree-globe').hidden=true;$('tree-globe').classList.remove('globe-fallback'); fallbackFinale?.stop();fallbackPepperGame?.stop();world?.reset();
   stopEggGame();
   $('parcel').disabled = false; $('parcel').hidden = false;
   $('hint').hidden = true; $('instruction').textContent = 'Hay un regalo que no puede quedarse quieto.';
@@ -184,9 +227,13 @@ $('envelope-card').addEventListener('click', async () => {
 });
 
 // Local review shortcut. Vite removes this branch from the production build.
-if(import.meta.env.DEV && new URLSearchParams(location.search).get('preview')==='finale') {
+if(import.meta.env.DEV && ['finale','eggs','pepper'].includes(new URLSearchParams(location.search).get('preview'))) {
   worldReady.then(()=>{
     $('christmas-envelope').hidden=true;document.querySelector('main').inert=false;
-    world?.finishArrival();phase='complete';$('reset').disabled=false;$('parcel').hidden=true;revealTreeGlobe();
+    world?.finishArrival();$('reset').disabled=false;$('parcel').hidden=true;
+    const preview=new URLSearchParams(location.search).get('preview');
+    if(preview==='finale'){phase='complete';revealTreeGlobe();}
+    else if(preview==='eggs'){phase='opened';$('search').click();}
+    else {phase='searching';eggComplete();}
   });
 }

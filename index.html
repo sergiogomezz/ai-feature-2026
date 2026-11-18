@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#65c9bd"><meta name="robots" content="noindex,nofollow"><title>feature</title><link rel="preload" as="image" href="/maria-head-cutout.png"><link rel="stylesheet" href="style.css"></head>
 <body>
-<div class="controls"><button id="sound" aria-label="Activar sonido" title="Activar sonido" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17V5l10-2v12M10 8l10-2"/><ellipse cx="7" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/><path class="music-slash" d="M3 3l18 18"/></svg></button><button id="pause" aria-label="Pausar animaciones" title="Pausar animaciones" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="pause-icon" d="M8 5v14M16 5v14"/><path class="play-icon" d="m8 4 12 8-12 8Z"/></svg></button><button id="reset" disabled aria-label="Volver a empezar" title="Volver a empezar">↺</button></div>
+<div class="controls"><button id="sound" aria-label="Activar sonido" title="Activar sonido" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17V5l10-2v12M10 8l10-2"/><ellipse cx="7" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/><path class="music-slash" d="M3 3l18 18"/></svg></button><button id="pause" aria-label="Pausar animaciones" title="Pausar animaciones" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="pause-icon" d="M8 5v14M16 5v14"/><path class="play-icon" d="m8 4 12 8-12 8Z"/></svg></button><button id="speed" hidden aria-label="Acelerar a velocidad doble" title="Acelerar a velocidad doble" aria-pressed="false">×1</button><button id="reset" disabled aria-label="Volver a empezar" title="Volver a empezar">↺</button></div>
 <section id="christmas-envelope" aria-label="Felicitación de Navidad">
 <div class="envelope-snow" aria-hidden="true">✦</div>
 <div id="envelope" class="envelope">
@@ -14,15 +14,15 @@
 <main inert>
 <h1 class="sr-only">El regalo de María</h1><span id="chapter" class="sr-only"></span>
 
-<div id="world"><div id="fallback" class="fallback"><span>★</span><div class="tree-shape"></div><button id="fallback-parcel" class="fallback-box" aria-label="Abrir el regalo de María">🎁</button></div><button id="parcel" class="sr-only" aria-label="Abrir el regalo de María">Para María</button><button id="tree-globe" class="tree-globe-control" aria-label="Entrar en la bola del mundo del árbol" hidden></button><button id="window-entry" class="sr-only" aria-label="Saltar por la ventana">Saltar por la ventana</button><section id="egg-game" aria-label="Huevazos por la habitación" hidden><div class="egg-heading"><span>LA PRIMERA PRUEBA</span><h2>A huevazo limpio.</h2><p>Busca las cinco caras. Arrastra para mirar.</p></div><div class="egg-targets"></div></section></div>
+<div id="world"><div id="fallback" class="fallback"><span>★</span><div class="tree-shape"></div><button id="fallback-parcel" class="fallback-box" aria-label="Abrir el regalo de María">🎁</button></div><button id="parcel" class="sr-only" aria-label="Abrir el regalo de María">Para María</button><button id="tree-globe" class="tree-globe-control" aria-label="Entrar en la bola del mundo del árbol" hidden></button><section id="egg-game" aria-label="Huevazos por la habitación" hidden><div class="egg-heading"><h2>A huevazo limpio.</h2><p>Busca las cinco caras. Arrastra para mirar.</p></div><div class="egg-targets"></div></section></div>
 <div class="bottom"><p id="instruction" class="sr-only"></p><div class="search-tools"><p id="progress" role="status" aria-live="polite"></p><button id="hint" class="quiet" hidden>¿Una pista?</button></div></div>
 </main>
-<dialog id="letter" aria-labelledby="letter-title"><button id="close-letter" class="close" aria-label="Cerrar la nota">×</button><div class="paper"><span class="paper-star" aria-hidden="true">✦</span><h2 id="letter-title">¡Aquí no cabe<br>tu regalo!</h2><p>Encuentra las <strong>5 caras</strong><br>por la habitación<br>a huevazo limpio<br>y te cuento más…</p><button id="search" class="primary">¡Voy! <span aria-hidden="true">↗</span></button></div></dialog>
+<dialog id="letter" aria-labelledby="letter-title"><button id="close-letter" class="close" aria-label="Cerrar la nota">×</button><div class="paper"><span class="paper-star" aria-hidden="true">✦</span><h2 id="letter-title">¡Aquí no cabe<br>tu regalo!</h2><p>Acierta a las <strong>5 caras</strong><br>con los huevos.</p><button id="search" class="primary">Empezar <span aria-hidden="true">↗</span></button></div></dialog>
 
 <section id="finale" aria-label="El viaje de María" hidden>
-  <img id="journey-aerial" class="journey-aerial" src="/ending/palau-aerial.jpg" alt="Recreación aérea con IA del Palau Sant Jordi en Barcelona" hidden>
-  <div class="journey-copy" aria-live="polite"><span id="journey-label">UN POCO MÁS LEJOS…</span><p id="journey-caption">Hay regalos que te llevan lejos.</p></div>
-  <a class="journey-source" href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noreferrer">Tierra: Solar System Scope · CC BY 4.0</a>
+  <img id="journey-aerial" class="journey-aerial" src="/ending/palau-aerial.jpg" alt="Recreación con IA del Palau Sant Jordi con Barcelona de fondo" hidden>
+  <div class="journey-copy" aria-live="polite"><span id="journey-label"></span></div>
+  <div class="journey-source"><a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noreferrer">Tierra: Solar System Scope</a><span> · </span><a href="https://cloudless.eox.at" target="_blank" rel="noreferrer">EOxCloudless · EOX (Copernicus 2016)</a><span> · </span><a href="https://pnoa.ign.es/" target="_blank" rel="noreferrer">PNOA · IGN/CC. AA.</a><span> · CC BY 4.0</span></div>
   <div class="journey-line" aria-hidden="true"><span></span></div>
   <div id="ending-stage" hidden>
     <video id="ending-film" playsinline preload="none" poster="/ending/stage-poster.jpg" aria-label="Recreación con IA de Quevedo en el escenario; voz sintética original"><source src="/ending/quevedo-stage.mp4" type="video/mp4"></video>
@@ -32,12 +32,12 @@
     <button id="show-tickets" class="ending-skip">Ver el regalo ↗</button>
   </div>
   <section id="ending-tickets" aria-label="Dos entradas de regalo para María" hidden>
-    <div class="ticket-intro"><span>AHORA SÍ, MARÍA.</span><h2>Nos vemos<br>cantándolo todo.</h2><p>Dos entradas. Una noche para recordar.</p></div>
+    <div class="ticket-intro"><h2>¡Nos vamos a ver a Quevedo!</h2></div>
     <div class="ticket-pair">
       <article class="concert-ticket" aria-label="Primera entrada decorativa"><div class="ticket-main"><span class="ticket-type">ENTRADA PARA</span><h3>QUEVEDO</h3><p>Martes, 6 de julio de 2027</p></div><div class="ticket-stub" aria-hidden="true"><span>01</span><small>PARA TI</small></div></article>
       <article class="concert-ticket" aria-label="Segunda entrada decorativa"><div class="ticket-main"><span class="ticket-type">ENTRADA PARA</span><h3>QUEVEDO</h3><p>Martes, 6 de julio de 2027</p></div><div class="ticket-stub" aria-hidden="true"><span>02</span><small>PARA TI</small></div></article>
     </div>
-    <div class="ticket-actions"><p class="ticket-venue">Palau Sant Jordi · Barcelona</p><p class="ticket-note">Las entradas reales están guardadas.<br>Estas son solo para la sorpresa.</p><button id="replay-message" class="ending-replay">Volver a escuchar el mensaje ↺</button></div>
+    <div class="ticket-actions"><p class="ticket-venue">Palau Sant Jordi · Barcelona</p><p class="ticket-note">Entradas decorativas. Las originales las tengo yo.</p><button id="replay-message" class="ending-replay">Volver a escuchar el mensaje ↺</button></div>
   </section>
 </section>
 <noscript><p class="noscript">Activa JavaScript para abrir el regalo.</p></noscript>

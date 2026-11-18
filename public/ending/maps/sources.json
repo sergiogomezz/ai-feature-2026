@@ -1,0 +1,98 @@
+{
+  "center": {
+    "lat": 41.3634,
+    "lon": 2.1526
+  },
+  "crs": "EPSG:3857",
+  "pixels": 2048,
+  "attribution": {
+    "EOX": "EOxCloudless by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2016), CC BY 4.0",
+    "IGN": "PNOA \u00b7 IGN y comunidades aut\u00f3nomas, CC BY 4.0 scne.es"
+  },
+  "layers": [
+    {
+      "file": "barcelona-00.webp",
+      "span": 8000000.0,
+      "source": "EOX",
+      "url": "https://tiles.maps.eox.at/wms?service=WMS&version=1.1.1&request=GetMap&layers=s2cloudless_3857&styles=&srs=EPSG%3A3857&bbox=-3760373.6641183994%2C1066091.753163131%2C4239626.335881601%2C9066091.753163131&width=2048&height=2048&format=image%2Fjpeg"
+    },
+    {
+      "file": "barcelona-01.webp",
+      "span": 4000000.0,
+      "source": "EOX",
+      "url": "https://tiles.maps.eox.at/wms?service=WMS&version=1.1.1&request=GetMap&layers=s2cloudless_3857&styles=&srs=EPSG%3A3857&bbox=-1760373.6641183994%2C3066091.753163131%2C2239626.3358816006%2C7066091.753163131&width=2048&height=2048&format=image%2Fjpeg"
+    },
+    {
+      "file": "barcelona-02.webp",
+      "span": 2000000.0,
+      "source": "EOX",
+      "url": "https://tiles.maps.eox.at/wms?service=WMS&version=1.1.1&request=GetMap&layers=s2cloudless_3857&styles=&srs=EPSG%3A3857&bbox=-760373.6641183994%2C4066091.753163131%2C1239626.3358816006%2C6066091.753163131&width=2048&height=2048&format=image%2Fjpeg"
+    },
+    {
+      "file": "barcelona-03.webp",
+      "span": 1000000.0,
+      "source": "EOX",
+      "url": "https://tiles.maps.eox.at/wms?service=WMS&version=1.1.1&request=GetMap&layers=s2cloudless_3857&styles=&srs=EPSG%3A3857&bbox=-260373.66411839932%2C4566091.753163131%2C739626.3358816006%2C5566091.753163131&width=2048&height=2048&format=image%2Fjpeg"
+    },
+    {
+      "file": "barcelona-04.webp",
+      "span": 500000.0,
+      "source": "EOX",
+      "url": "https://tiles.maps.eox.at/wms?service=WMS&version=1.1.1&request=GetMap&layers=s2cloudless_3857&styles=&srs=EPSG%3A3857&bbox=-10373.66411839932%2C4816091.753163131%2C489626.3358816007%2C5316091.753163131&width=2048&height=2048&format=image%2Fjpeg"
+    },
+    {
+      "file": "barcelona-05.webp",
+      "span": 250000.0,
+      "source": "EOX",
+      "url": "https://tiles.maps.eox.at/wms?service=WMS&version=1.1.1&request=GetMap&layers=s2cloudless_3857&styles=&srs=EPSG%3A3857&bbox=114626.33588160068%2C4941091.753163131%2C364626.3358816007%2C5191091.753163131&width=2048&height=2048&format=image%2Fjpeg"
+    },
+    {
+      "file": "barcelona-06.webp",
+      "span": 125000.0,
+      "source": "EOX",
+      "url": "https://tiles.maps.eox.at/wms?service=WMS&version=1.1.1&request=GetMap&layers=s2cloudless_3857&styles=&srs=EPSG%3A3857&bbox=177126.33588160068%2C5003591.753163131%2C302126.3358816007%2C5128591.753163131&width=2048&height=2048&format=image%2Fjpeg"
+    },
+    {
+      "file": "barcelona-07.webp",
+      "span": 62500.0,
+      "source": "EOX",
+      "url": "https://tiles.maps.eox.at/wms?service=WMS&version=1.1.1&request=GetMap&layers=s2cloudless_3857&styles=&srs=EPSG%3A3857&bbox=208376.33588160068%2C5034841.753163131%2C270876.3358816007%2C5097341.753163131&width=2048&height=2048&format=image%2Fjpeg"
+    },
+    {
+      "file": "barcelona-08.webp",
+      "span": 31250.0,
+      "source": "IGN",
+      "url": "https://www.ign.es/wms-inspire/pnoa-ma?service=WMS&version=1.1.1&request=GetMap&layers=OI.OrthoimageCoverage&styles=&srs=EPSG%3A3857&bbox=224001.33588160068%2C5050466.753163131%2C255251.33588160068%2C5081716.753163131&width=2048&height=2048&format=image%2Fjpeg"
+    },
+    {
+      "file": "barcelona-09.webp",
+      "span": 15625.0,
+      "source": "IGN",
+      "url": "https://www.ign.es/wms-inspire/pnoa-ma?service=WMS&version=1.1.1&request=GetMap&layers=OI.OrthoimageCoverage&styles=&srs=EPSG%3A3857&bbox=231813.83588160068%2C5058279.253163131%2C247438.83588160068%2C5073904.253163131&width=2048&height=2048&format=image%2Fjpeg"
+    },
+    {
+      "file": "barcelona-10.webp",
+      "span": 7812.5,
+      "source": "IGN",
+      "url": "https://www.ign.es/wms-inspire/pnoa-ma?service=WMS&version=1.1.1&request=GetMap&layers=OI.OrthoimageCoverage&styles=&srs=EPSG%3A3857&bbox=235720.08588160068%2C5062185.503163131%2C243532.58588160068%2C5069998.003163131&width=2048&height=2048&format=image%2Fjpeg"
+    },
+    {
+      "file": "barcelona-11.webp",
+      "span": 3906.25,
+      "source": "IGN",
+      "url": "https://www.ign.es/wms-inspire/pnoa-ma?service=WMS&version=1.1.1&request=GetMap&layers=OI.OrthoimageCoverage&styles=&srs=EPSG%3A3857&bbox=237673.21088160068%2C5064138.628163131%2C241579.46088160068%2C5068044.878163131&width=2048&height=2048&format=image%2Fjpeg"
+    },
+    {
+      "file": "barcelona-12.webp",
+      "span": 1953.125,
+      "source": "IGN",
+      "url": "https://www.ign.es/wms-inspire/pnoa-ma?service=WMS&version=1.1.1&request=GetMap&layers=OI.OrthoimageCoverage&styles=&srs=EPSG%3A3857&bbox=238649.77338160068%2C5065115.190663131%2C240602.89838160068%2C5067068.315663131&width=2048&height=2048&format=image%2Fjpeg"
+    },
+    {
+      "file": "barcelona-13.webp",
+      "span": 976.5625,
+      "source": "IGN",
+      "url": "https://www.ign.es/wms-inspire/pnoa-ma?service=WMS&version=1.1.1&request=GetMap&layers=OI.OrthoimageCoverage&styles=&srs=EPSG%3A3857&bbox=239138.05463160068%2C5065603.471913131%2C240114.61713160068%2C5066580.034413131&width=2048&height=2048&format=image%2Fjpeg"
+    }
+  ]
+}
