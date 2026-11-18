@@ -14,13 +14,15 @@ Esta skill conserva la dirección creativa y técnica de un proyecto en evoluci�
 3. Consultar [Herramientas](references/herramientas.md), [recursos y prompts del final](references/final-assets.md) o `scripts/VIDEO.md` solo si se va a cambiar esa parte. No cargar el historial de investigación por defecto.
 4. Contrastar siempre la memoria con el código real. Una propuesta o investigación no equivale a implementación.
 
+El usuario revisa esta web en su Chrome habitual en `http://127.0.0.1:4174/`. No confundir esa ventana con el navegador integrado ni abrir un perfil independiente. El resumen de estado conserva cómo arrancar, el estado de Git y las verificaciones del último cierre.
+
 ## Cómo avanzar
 
-Trabajar en una porción visible y jugable cada vez, manteniendo un recorrido que pueda revisarse. El primer tramo ya funciona: sobre → llegada de Reyes → regalo → cinco caras de María a huevazos por la habitación → ventana que se abre y caída → pimiento volador por seis aros → bola del mundo brillante en el árbol → Tierra/Palau → vídeo y dos tarjetas. Continuar desde el estado comprobado. No migrar todo el proyecto ni añadir varios motores solo porque estén en la lista de candidatos.
+Trabajar en una porción visible y jugable cada vez, manteniendo un recorrido que pueda revisarse. El primer tramo ya funciona: sobre → llegada de Reyes → regalo → cinco caras de María a huevazos por la habitación → ventana abierta con cortinas al viento que espera clic (caras aún manchadas) → caída → pimiento volador por seis aros con colisiones → paquete con cámara y fotomatón de cinco gestos → bola del mundo brillante en el árbol → Tierra/Palau → vídeo y dos tarjetas. Continuar desde el estado comprobado. No migrar todo el proyecto ni añadir varios motores solo porque estén en la lista de candidatos.
 
 El regalo debe funcionar en móvil y escritorio. Evitar que una animación, el audio bloqueado por el navegador o una pista difícil impidan llegar al final: ofrecer ayuda, controles de audio y alternativa con movimiento reducido. La llegada de los Reyes no lleva botón de saltar, por petición explícita. Mantener el título del navegador exactamente `feature`. Son criterios de implementación propuestos, no decisiones estéticas del usuario.
 
-Conservar los datos exactos de la compra. Los billetes decorativos no son entradas válidas: no inventar asientos, códigos QR ni datos de acceso. Existe una primera recreación de vídeo generada localmente con voz sintética original; consultar estado, herramientas y recursos del final. Identificarla como IA y no presentarla como saludo auténtico ni como voz clonada del artista. No contratar servicios de pago; las entradas reales permanecen privadas con el usuario.
+Conservar los datos exactos de la compra. Los billetes decorativos no son entradas válidas: no inventar asientos, códigos QR ni datos de acceso. Existe una primera recreación de vídeo generada localmente con voz sintética original; consultar estado, herramientas y recursos del final. Conservar su procedencia de IA en la memoria y descripciones accesibles, sin presentarla como saludo auténtico. Por petición posterior del usuario, no añadir notas, aclaraciones ni créditos visibles al recorrido. No contratar servicios de pago; las entradas reales permanecen privadas con el usuario.
 
 ## Mantener la memoria
 

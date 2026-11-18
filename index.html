@@ -6,7 +6,7 @@
 <div class="envelope-snow" aria-hidden="true">✦</div>
 <div id="envelope" class="envelope">
 <span class="envelope-back" aria-hidden="true"></span>
-<button id="envelope-card" class="envelope-letter" disabled aria-label="Para María. Continuar"><span>Para María</span><small aria-hidden="true">✧</small></button>
+<button id="envelope-card" class="envelope-letter" disabled aria-label="Para María. Entrar en la habitación"><span>Para María</span><strong class="envelope-letter-action" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h15M13 5l7 7-7 7"/></svg></strong></button>
 <span class="envelope-front" aria-hidden="true"></span><span class="envelope-flap" aria-hidden="true"></span><span class="envelope-seal" aria-hidden="true">✦</span><span class="envelope-greeting" aria-hidden="true">Feliz Navidad</span>
 <button id="open-envelope" aria-label="Abrir el sobre: Feliz Navidad"></button>
 </div><p id="envelope-status" role="status"></p>
@@ -15,6 +15,7 @@
 <h1 class="sr-only">El regalo de María</h1><span id="chapter" class="sr-only"></span>
 
 <div id="world"><div id="fallback" class="fallback"><span>★</span><div class="tree-shape"></div><button id="fallback-parcel" class="fallback-box" aria-label="Abrir el regalo de María">🎁</button></div><button id="parcel" class="sr-only" aria-label="Abrir el regalo de María">Para María</button><button id="tree-globe" class="tree-globe-control" aria-label="Entrar en la bola del mundo del árbol" hidden></button><section id="egg-game" aria-label="Huevazos por la habitación" hidden><div class="egg-heading"><h2>A huevazo limpio.</h2><p>Busca las cinco caras. Arrastra para mirar.</p></div><div class="egg-targets"></div></section></div>
+<button id="window-jump" class="window-jump" hidden aria-label="Saltar por la ventana"><span aria-hidden="true">↗</span></button>
 <div class="bottom"><p id="instruction" class="sr-only"></p><div class="search-tools"><p id="progress" role="status" aria-live="polite"></p><button id="hint" class="quiet" hidden>¿Una pista?</button></div></div>
 </main>
 <dialog id="letter" aria-labelledby="letter-title"><button id="close-letter" class="close" aria-label="Cerrar la nota">×</button><div class="paper"><span class="paper-star" aria-hidden="true">✦</span><h2 id="letter-title">¡Aquí no cabe<br>tu regalo!</h2><p>Acierta a las <strong>5 caras</strong><br>con los huevos.</p><button id="search" class="primary">Empezar <span aria-hidden="true">↗</span></button></div></dialog>
@@ -22,22 +23,42 @@
 <section id="finale" aria-label="El viaje de María" hidden>
   <img id="journey-aerial" class="journey-aerial" src="/ending/palau-aerial.jpg" alt="Recreación con IA del Palau Sant Jordi con Barcelona de fondo" hidden>
   <div class="journey-copy" aria-live="polite"><span id="journey-label"></span></div>
-  <div class="journey-source"><a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noreferrer">Tierra: Solar System Scope</a><span> · </span><a href="https://cloudless.eox.at" target="_blank" rel="noreferrer">EOxCloudless · EOX (Copernicus 2016)</a><span> · </span><a href="https://pnoa.ign.es/" target="_blank" rel="noreferrer">PNOA · IGN/CC. AA.</a><span> · CC BY 4.0</span></div>
   <div class="journey-line" aria-hidden="true"><span></span></div>
   <div id="ending-stage" hidden>
-    <video id="ending-film" playsinline preload="none" poster="/ending/stage-poster.jpg" aria-label="Recreación con IA de Quevedo en el escenario; voz sintética original"><source src="/ending/quevedo-stage.mp4" type="video/mp4"></video>
-    <p class="ending-disclosure">Recreación con IA · Voz sintética original</p>
-    <p class="ending-subtitle">María… tengo una cosina para ti.</p>
+    <video id="ending-film" playsinline preload="none" poster="/ending/stage-poster.jpg" aria-label="Recreación con IA de Quevedo en el escenario; audio generado con IA"><source src="/ending/quevedo-message.mp4" type="video/mp4"></video>
+
     <button id="ending-play" class="ending-play" hidden>Escuchar el mensaje <span aria-hidden="true">▶</span></button>
     <button id="show-tickets" class="ending-skip">Ver el regalo ↗</button>
   </div>
   <section id="ending-tickets" aria-label="Dos entradas de regalo para María" hidden>
     <div class="ticket-intro"><h2>¡Nos vamos a ver a Quevedo!</h2></div>
     <div class="ticket-pair">
-      <article class="concert-ticket" aria-label="Primera entrada decorativa"><div class="ticket-main"><span class="ticket-type">ENTRADA PARA</span><h3>QUEVEDO</h3><p>Martes, 6 de julio de 2027</p></div><div class="ticket-stub" aria-hidden="true"><span>01</span><small>PARA TI</small></div></article>
-      <article class="concert-ticket" aria-label="Segunda entrada decorativa"><div class="ticket-main"><span class="ticket-type">ENTRADA PARA</span><h3>QUEVEDO</h3><p>Martes, 6 de julio de 2027</p></div><div class="ticket-stub" aria-hidden="true"><span>02</span><small>PARA TI</small></div></article>
+      <article class="concert-ticket" aria-label="Entrada decorativa para Sergio Gómez Martín">
+        <div class="ticket-art"><img src="/ending/quevedo-el-baifo-tour-2027.png" width="222" height="222" alt="Cartel de Quevedo, El Baifo Tour 2027" decoding="async"></div>
+        <div class="ticket-main">
+          <div class="ticket-tour">EL BAIFO TOUR <span>2027</span></div>
+          <h3>QUEVEDO</h3>
+          <div class="ticket-holder"><span>PARA</span><strong>Sergio Gómez Martín</strong></div>
+          <div class="ticket-event"><time datetime="2027-07-06T20:30:00+02:00">Martes, 6 de julio de 2027</time><strong>20:30 h</strong></div>
+          <p class="ticket-location">Palau Sant Jordi <span>Barcelona</span></p>
+        </div>
+        <div class="ticket-stub" aria-hidden="true"><span>2027</span><small>EL BAIFO TOUR</small></div>
+      </article>
+      <article class="concert-ticket" aria-label="Entrada decorativa para María Porras Agenjo">
+        <div class="ticket-art"><img src="/ending/quevedo-el-baifo-tour-2027.png" width="222" height="222" alt="Cartel de Quevedo, El Baifo Tour 2027" decoding="async"></div>
+        <div class="ticket-main">
+          <div class="ticket-tour">EL BAIFO TOUR <span>2027</span></div>
+          <h3>QUEVEDO</h3>
+          <div class="ticket-holder"><span>PARA</span><strong>María Porras Agenjo</strong></div>
+          <div class="ticket-event"><time datetime="2027-07-06T20:30:00+02:00">Martes, 6 de julio de 2027</time><strong>20:30 h</strong></div>
+          <p class="ticket-location">Palau Sant Jordi <span>Barcelona</span></p>
+        </div>
+        <div class="ticket-stub" aria-hidden="true"><span>2027</span><small>EL BAIFO TOUR</small></div>
+      </article>
     </div>
-    <div class="ticket-actions"><p class="ticket-venue">Palau Sant Jordi · Barcelona</p><p class="ticket-note">Entradas decorativas. Las originales las tengo yo.</p><button id="replay-message" class="ending-replay">Volver a escuchar el mensaje ↺</button></div>
+    <div class="ticket-actions">
+      <button id="replay-message" class="ending-replay">Volver a escuchar el mensaje ↺</button>
+    </div>
   </section>
 </section>
 <noscript><p class="noscript">Activa JavaScript para abrir el regalo.</p></noscript>

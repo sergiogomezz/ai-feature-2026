@@ -7,10 +7,11 @@ import { createFinale } from './finale.js';
 import { createPepperGame } from './pepper-game.js';
 import { createEggGame } from './egg-game.js';
 import { createRoyalArrival } from './royal-arrival.js';
+import { createArrivalDoor } from './arrival-door.js';
 import { surfaceTexture, addFir } from './materials.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-export function createWorld(container, {onGift, onGlobe, isWrapped, canOpenGift, reduced}) {
+export function createWorld(container, {onGift, onGlobe, onCamera, isWrapped, canOpenGift, reduced}) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#282d2b');
   const camera = new THREE.PerspectiveCamera(36, 1, .1, 80);
@@ -40,12 +41,12 @@ export function createWorld(container, {onGift, onGlobe, isWrapped, canOpenGift,
   const box=(w,h,d,m,x,y,z,p=scene,out=true)=>mesh(new RoundedBoxGeometry(w,h,d,2,Math.min(.045,w*.14,h*.14,d*.14)),m,x,y,z,p,out);
   const sphere=(r,m,x,y,z,p=scene,out=true)=>mesh(new THREE.SphereGeometry(r,24,18),m,x,y,z,p,out);
   // Complete room, with real floor, walls and depth behind the tree.
-  box(25,.18,24,wood,0,-.14,1,scene,false);
+  box(40,.18,50,wood,0,-.14,1,scene,false);
   box(25,12,.18,mint,0,5.8,-3.4,scene,false);
-  box(.18,12,22,mat('#4fb4ab'),-7,5.8,7.5,scene,false);
+  const arrivalDoor=createArrivalDoor(scene,{wall:mat('#4fb4ab'),trim:mat('#e6dccc'),wood:mat('#917758'),floor:wood});
   box(25,.2,.14,mat('#ffe3ad'),0,.12,-3.25);
-  for(let i=-12;i<13;i++)box(.018,.005,22,mat('#c98760'),i*.8,-.043,1,scene,false);
-  for(let i=-6;i<7;i++)box(24,.005,.018,mat('#c98760'),0,-.041,i*1.6,scene,false);
+  for(let i=-12;i<13;i++)box(.018,.005,50,mat('#c98760'),i*.8,-.043,1,scene,false);
+  for(let i=-15;i<16;i++)box(40,.005,.018,mat('#c98760'),0,-.041,i*1.6,scene,false);
   // Painted wall panels and layered cornice.
   for(let x=-6;x<9;x+=1.4){box(.035,1.65,.04,mat('#8c9787'),x,.95,-3.27);box(1.25,.035,.04,mat('#8c9787'),x+.65,1.76,-3.27);}
   box(25,.07,.1,mat('#a6ad9c'),0,1.9,-3.23);
@@ -111,7 +112,25 @@ export function createWorld(container, {onGift, onGlobe, isWrapped, canOpenGift,
   const starShape=new THREE.Shape();for(let i=0;i<10;i++){const a=Math.PI/2+i*Math.PI/5,r=i%2?.17:.36;const x=Math.cos(a)*r,y=Math.sin(a)*r;i?starShape.lineTo(x,y):starShape.moveTo(x,y);}starShape.closePath();
   const topStar=mesh(new THREE.ExtrudeGeometry(starShape,{depth:.12,bevelEnabled:true,bevelThickness:.035,bevelSize:.025,bevelSegments:3}),gold,0,4.6,0,tree);topStar.rotation.y=.3;
   function smallGift(x,z,c,w,h){const g=new THREE.Group();scene.add(g);g.position.set(x,0,z);g.rotation.y=x*.2;const m=mat(c);box(w,h,w,m,0,h/2,0,g);box(w+.06,.12,w+.06,m,0,h,0,g);box(.1,h+.13,w+.08,gold,0,h/2+.03,0,g);return g;}
-  smallGift(-1.65,1,'#97d8ea',.65,.65);smallGift(-.6,1.65,'#ffb16e',.5,.4);
+  const cameraParcel=smallGift(-1.65,1,'#97d8ea',.65,.65);smallGift(-.6,1.65,'#ffb16e',.5,.4);
+  let cameraUnlocked=false,cameraOpened=false;
+  const photoCamera=new THREE.Group();photoCamera.position.set(-1.65,.95,1);scene.add(photoCamera);photoCamera.visible=false;
+  const cameraBlack=mat('#24352f'),cameraSilver=new THREE.MeshStandardMaterial({color:'#c9cfc5',metalness:.7,roughness:.3});
+  mesh(new RoundedBoxGeometry(.55,.34,.23,3,.04),cameraBlack,0,0,0,photoCamera);
+  box(.55,.07,.23,cameraSilver,0,.16,0,photoCamera);
+  box(.13,.09,.12,cameraSilver,-.15,.23,0,photoCamera);
+  const lens=mesh(new THREE.CylinderGeometry(.13,.14,.16,32),cameraBlack,.06,0,.16,photoCamera);lens.rotation.x=Math.PI/2;
+  const glass=mesh(new THREE.CylinderGeometry(.10,.10,.008,32),new THREE.MeshPhysicalMaterial({color:'#518f9b',metalness:.7,roughness:.1,clearcoat:1}),.06,0,.245,photoCamera);glass.rotation.x=Math.PI/2;
+  box(.09,.055,.015,mat('#fff1be'),-.17,.08,.125,photoCamera);
+  function revealCameraPackage(){cameraUnlocked=true;cameraOpened=false;photoCamera.visible=false;cameraParcel.children[1].position.y=.65;cameraParcel.children[1].rotation.z=0;}
+  function openCameraPackage(){cameraOpened=true;photoCamera.visible=true;cameraParcel.children[1].position.y=.85;cameraParcel.children[1].rotation.z=-.4;}
+  function hideCameraPackage(){cameraUnlocked=false;photoCamera.visible=false;cameraParcel.children[1].position.y=.65;cameraParcel.children[1].rotation.z=0;}
+  function updateCameraPackage(){
+    if(!cameraUnlocked)return;
+    const button=document.getElementById('camera-package');if(!button)return;
+    const p=new THREE.Vector3(-1.65,cameraOpened?1.05:.55,1).project(camera);
+    button.style.left=`${(p.x*.5+.5)*container.clientWidth}px`;button.style.top=`${(-p.y*.5+.5)*container.clientHeight}px`;button.disabled=paused;
+  }
   const gift=new THREE.Group();scene.add(gift);gift.visible=false;gift.position.set(1.05,0,1.3);gift.rotation.y=-.3;
   // Five faces: the package is hollow, including its ribbons.
   box(1.12,.08,.92,pink,0,.065,0,gift);
@@ -138,7 +157,31 @@ export function createWorld(container, {onGift, onGlobe, isWrapped, canOpenGift,
   for(const y of [1.2,2.6,3.8]){const light=new THREE.PointLight('#ffc776',2.1,3,2);light.position.set(-.45,y,.6);scene.add(light);}
   // Curtain folds add silhouette and soft fabric around the window.
   const curtainMat=new THREE.MeshStandardMaterial({color:'#c6bda7',map:fabricTexture,roughness:1,side:THREE.DoubleSide});
-  for(const side of [-1,1]){const geo=new THREE.PlaneGeometry(.7,3.3,24,12);const positions=geo.attributes.position;for(let i=0;i<positions.count;i++)positions.setZ(i,Math.sin(positions.getX(i)*44)*.07);geo.computeVertexNormals();mesh(geo,curtainMat,3+side*1.48,3.52,-2.94);}
+  const curtains=[],wind={strength:0};let windowFraming=false;
+  for(const side of [-1,1]){const geo=new THREE.PlaneGeometry(.7,3.3,24,12);const positions=geo.attributes.position;for(let i=0;i<positions.count;i++)positions.setZ(i,Math.sin(positions.getX(i)*44)*.07);geo.computeVertexNormals();mesh(geo,curtainMat,3+side*1.48,3.52,-2.94);curtains.push({geo,base:positions.array.slice(),side});}
+  function updateCurtains(time){
+    for(const {geo,base,side} of curtains){
+      const positions=geo.attributes.position;
+      for(let i=0;i<positions.count;i++){
+        const x=base[i*3],y=base[i*3+1],z=base[i*3+2],loose=(1.65-y)/3.3;
+        const wave=reduced.matches?.25:Math.sin(time*2.8+loose*4+side);
+        const ripple=reduced.matches?0:Math.sin(x*13+time*2)*.08;
+        positions.setXYZ(i,x+side*wind.strength*loose*(.13+.12*wave),y,z+wind.strength*loose*loose*(.35+.3*wave+ripple));
+      }
+      positions.needsUpdate=true;geo.computeVertexNormals();
+    }
+  }
+  const windowButton=document.getElementById('window-jump');let windowUnlocked=false;
+  function updateWindowButton(){
+    if(!windowUnlocked)return;
+    camera.updateMatrixWorld();win.updateWorldMatrix(true,false);
+    const points=[[-1.04,-1.25],[1.04,-1.25],[-1.04,1.25],[1.04,1.25]].map(([x,y])=>win.localToWorld(new THREE.Vector3(x,y,.3)).project(camera));
+    const xs=points.map(p=>(p.x+1)*container.clientWidth/2),ys=points.map(p=>(1-p.y)*container.clientHeight/2);
+    const left=Math.min(...xs),top=Math.min(...ys),width=Math.max(...xs)-left,height=Math.max(...ys)-top;
+    windowButton.classList.toggle('window-offscreen',left+width<35||left>container.clientWidth-35||top+height<70||top>container.clientHeight-35);
+    Object.assign(windowButton.style,{left:`${left}px`,top:`${top}px`,width:`${Math.max(48,width)}px`,height:`${Math.max(48,height)}px`});
+    windowButton.disabled=paused;
+  }
   const rail=mesh(new THREE.CylinderGeometry(.025,.025,3.9,12),gold,3,5.22,-2.9);rail.rotation.z=Math.PI/2;
   const royal=createRoyalArrival(scene);
   let arrivalActive=false;
@@ -207,11 +250,29 @@ export function createWorld(container, {onGift, onGlobe, isWrapped, canOpenGift,
   }
   const streaks=[];
   for(let i=0;i<26;i++){const line=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,1.5,4),new THREE.MeshBasicMaterial({color:'#e8ffff'}));line.position.set(Math.sin(i*3)*6,20-i*3,-7-Math.cos(i)*3);sky.add(line);streaks.push(line);}
+  async function prepareWindow(){
+    eggGame?.settle();
+    const id=sequence;
+    windowFraming=true;controls.enabled=false;
+    const result=await Promise.all([
+      ...casements.map((hinge,i)=>tween(hinge.rotation,{y:i===0?-1.45:1.45},1100,'inOutSine')),
+      tween(wind,{strength:1},1300,'inOutSine'),
+      tween(camera.position,{x:3,y:6.2,z:camera.aspect<.8?12:10},1600,'inOutSine'),
+      tween(controls.target,{x:2.5,y:3.1,z:-2.6},1600,'inOutSine')
+    ]);
+    windowFraming=false;
+    if(id!==sequence||!result.every(Boolean))return false;
+    controls.enabled=!paused;controls.update();
+    windowUnlocked=true;windowButton.hidden=false;updateWindowButton();return true;
+  }
   async function fall(){
-    if(paused||busy||document.querySelector('dialog[open]'))return false;
+    if(paused||(busy&&!eggGame?.active)||document.querySelector('dialog[open]'))return false;
+    const fromEgg=Boolean(eggGame?.active),fromPosition=camera.position.clone(),fromTarget=controls.target.clone();
+    if(fromEgg)stopEggGame();
+    windowUnlocked=false;windowButton.hidden=true;
     const id=begin('window');veil.style.background='#8ddff2';
+    if(fromEgg){camera.position.copy(fromPosition);look.copy(fromTarget);}
     if(!await Promise.all([tween(camera.position,{x:3,y:3.5,z:.6},1100),tween(look,{x:3,y:3.5,z:-8},1100)]).then(r=>r.every(Boolean))||id!==sequence)return false;
-    if(!await Promise.all(casements.map((hinge,i)=>tween(hinge.rotation,{y:i===0?-1.5:1.5},1050,'outCubic'))).then(r=>r.every(Boolean))||id!==sequence)return false;
     if(!await Promise.all([tween(camera.position,{z:-2.9},700,'inCubic'),tween(veil,{opacity:1},700,'inCubic')]).then(r=>r.every(Boolean))||id!==sequence)return false;
     renderScene=sky;container.dataset.travel='falling';camera.position.set(0,19,2);look.set(0,15,-12);camera.fov=58;camera.updateProjectionMatrix();
     await tween(veil,{opacity:0},250);
@@ -221,24 +282,56 @@ export function createWorld(container, {onGift, onGlobe, isWrapped, canOpenGift,
     restore();return true;
   }
   function finishArrival(){
-    cancel();royal.group.visible=false;scene.attach(gift);gift.position.set(1.05,0,1.3);gift.rotation.set(0,-.3,0);gift.scale.setScalar(1);gift.visible=true;arrivalActive=false;
+    cancel();arrivalDoor.hinge.rotation.y=0;arrivalDoor.update();royal.group.visible=false;scene.attach(gift);gift.position.set(1.05,0,1.3);gift.rotation.set(0,-.3,0);gift.scale.setScalar(1);gift.visible=true;arrivalActive=false;
     if(busy)restore();
   }
   async function playArrival(){
     if(busy)return;
     const id=begin('arrival');
-    camera.position.set(3.2,6.7,camera.aspect<.75?22:13.8);look.set(.3,1.15,1.7);camera.lookAt(look);
-    arrivalActive=true;royal.group.scale.setScalar(camera.aspect<.75?.85:1);royal.group.visible=true;royal.motion.progress=0;royal.motion.exit=0;royal.motion.stumble=0;
+    const mobile=camera.aspect<.75;
+    arrivalActive=true;royal.group.scale.setScalar(1);royal.group.visible=true;royal.motion.progress=0;royal.motion.exit=0;royal.motion.stumble=0;
     royal.carrier.add(gift);gift.position.set(-.35,1.07,-.1);gift.rotation.set(0,-.3,0);gift.scale.setScalar(.45);gift.visible=true;
     royal.update(0,reduced.matches);
-    if(!await tween(royal.motion,{progress:1},7000,'inOutSine')||id!==sequence)return;
+    if(!await Promise.all([
+      tween(arrivalDoor.hinge.rotation,{y:-Math.PI*.46},1000,'inOutSine'),
+      tween(camera.position,{x:2,y:mobile?7:5.7,z:mobile?36:16},1000,'inOutSine'),
+      tween(look,{x:-2.8,y:1.4,z:2.6},1000,'inOutSine')
+    ]).then(r=>r.every(Boolean))||id!==sequence)return;
+    if(!await Promise.all([
+      tween(royal.motion,{progress:1},7000,'inOutSine'),
+      tween(camera.position,{x:mobile?2:3.2,y:mobile?7:6.7,z:mobile?36:13.8},7000,'inOutSine'),
+      tween(look,{x:mobile?-2.8:.3,y:mobile?1.4:1.15,z:mobile?2.6:1.7},7000,'inOutSine')
+    ]).then(r=>r.every(Boolean))||id!==sequence)return;
+    // The last tail has cleared the threshold before the door closes.
+    if(!await Promise.all([
+      tween(arrivalDoor.hinge.rotation,{y:0},1000,'inOutSine'),
+      tween(camera.position,{x:3.2,y:6.7,z:mobile?22:13.8},1000,'inOutSine'),
+      tween(look,{x:.3,y:1.15,z:1.7},1000,'inOutSine')
+    ]).then(r=>r.every(Boolean))||id!==sequence)return;
     container.dataset.travel='royal-tumble';
     if(!await tween(royal.motion,{stumble:1},7200,'linear')||id!==sequence)return;
     container.dataset.travel='royal-delivery';
     scene.attach(gift);
     if(!await Promise.all([tween(gift.position,{x:1.05,y:0,z:1.3},1700,'outBounce'),tween(gift.scale,{x:1,y:1,z:1},1700),tween(gift.rotation,{x:0,y:-.3,z:0},1700)]).then(r=>r.every(Boolean))||id!==sequence)return;
     container.dataset.travel='royal-departure';
-    if(!await tween(royal.motion,{exit:1},5200,'inOutSine')||id!==sequence)return;
+    if(!await Promise.all([
+      tween(arrivalDoor.hinge.rotation,{y:-Math.PI*.46},1000,'inOutSine'),
+      tween(camera.position,{x:mobile?2:3.2,y:mobile?7:6.7,z:mobile?36:13.8},1000,'inOutSine'),
+      tween(look,{x:mobile?-2.8:.3,y:mobile?1.4:1.15,z:mobile?2.6:1.7},1000,'inOutSine')
+    ]).then(r=>r.every(Boolean))||id!==sequence)return;
+    if(!await Promise.all([
+      tween(royal.motion,{exit:1},6200,'inOutSine'),
+      tween(camera.position,{x:2,y:mobile?7:5.7,z:mobile?36:16},6200,'inOutSine'),
+      tween(look,{x:-2.8,y:1.4,z:2.6},6200,'inOutSine')
+    ]).then(r=>r.every(Boolean))||id!==sequence)return;
+    royal.group.visible=false;
+    container.dataset.travel='royal-room-return';
+    // Arrive at the exact saved orbit pose before restoring the controls.
+    if(!await Promise.all([
+      tween(arrivalDoor.hinge.rotation,{y:0},1000,'inOutSine'),
+      tween(camera.position,{x:savedPosition.x,y:savedPosition.y,z:savedPosition.z},2200,'inOutSine'),
+      tween(look,{x:savedTarget.x,y:savedTarget.y,z:savedTarget.z},2200,'inOutSine')
+    ]).then(r=>r.every(Boolean))||id!==sequence)return;
     finishArrival();
   }
   function stopEggGame(){if(eggGame?.active){eggGame.stop();restore();}}
@@ -267,19 +360,19 @@ export function createWorld(container, {onGift, onGlobe, isWrapped, canOpenGift,
     if(!finale)finale=createFinale({renderer,container,reduced,...callbacks});
     finale.setPaused(paused);finale.start();
   }
-  function reset(){casements.forEach(hinge=>hinge.rotation.y=0);hideGlobe();stopFinale();stopPepperGame();stopEggGame();if(arrivalActive)finishArrival();cancel();if(busy||inside)restore();lid.position.set(0,.91,0);lid.rotation.set(0,0,0);controls.reset();}
+  function reset(){hideCameraPackage();windowFraming=false;windowUnlocked=false;windowButton.hidden=true;wind.strength=0;updateCurtains(0);casements.forEach(hinge=>hinge.rotation.y=0);hideGlobe();stopFinale();stopPepperGame();stopEggGame();if(arrivalActive)finishArrival();cancel();if(busy||inside)restore();lid.position.set(0,.91,0);lid.rotation.set(0,0,0);controls.reset();}
   let pointerStart;
   const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();
   renderer.domElement.addEventListener('pointermove',event=>{
     const r=renderer.domElement.getBoundingClientRect();
     pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);
     ray.setFromCamera(pointer,camera);
-    const clickable=!paused && !busy && ((globeUnlocked&&ray.intersectObject(treeGlobe,true).length>0) || (canOpenGift() && ray.intersectObject(gift,true).length>0));
+    const clickable=!paused && !busy && ((cameraUnlocked&&ray.intersectObjects([cameraParcel,photoCamera],true).length>0) || (globeUnlocked&&ray.intersectObject(treeGlobe,true).length>0) || (canOpenGift() && ray.intersectObject(gift,true).length>0));
     renderer.domElement.dataset.clickable=String(clickable);
   });
   renderer.domElement.addEventListener('pointerleave',()=>{delete renderer.domElement.dataset.clickable;});
   renderer.domElement.addEventListener('pointerdown',e=>pointerStart={x:e.clientX,y:e.clientY});
-  renderer.domElement.addEventListener('click',e=>{if(paused||busy||!pointerStart||Math.hypot(e.clientX-pointerStart.x,e.clientY-pointerStart.y)>8)return;const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);if(globeUnlocked&&ray.intersectObject(treeGlobe,true).length)onGlobe();else if(ray.intersectObject(gift,true).length)onGift();});
+  renderer.domElement.addEventListener('click',e=>{if(paused||busy||!pointerStart||Math.hypot(e.clientX-pointerStart.x,e.clientY-pointerStart.y)>8)return;const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);if(cameraUnlocked&&ray.intersectObjects([cameraParcel,photoCamera],true).length)onCamera();else if(globeUnlocked&&ray.intersectObject(treeGlobe,true).length)onGlobe();else if(ray.intersectObject(gift,true).length)onGift();});
   function resize(){const {width,height}=container.getBoundingClientRect();camera.aspect=width/height;const distance=camera.aspect<.7?14.2:camera.aspect<1?12.2:10.5;if(busy){camera.updateProjectionMatrix();renderer.setSize(width,height);eggGame?.resize();return;}camera.position.set(distance*.27,5.6,distance);controls.target.set(0,2.15,.15);camera.lookAt(controls.target);camera.updateProjectionMatrix();renderer.setSize(width,height);controls.update();controls.saveState();}
   const observer=new ResizeObserver(resize);observer.observe(container);resize();
   renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();reset();renderer.setAnimationLoop(null);renderer.domElement.hidden=true;document.getElementById('fallback').hidden=false;});
@@ -300,9 +393,9 @@ export function createWorld(container, {onGift, onGlobe, isWrapped, canOpenGift,
   function setPaused(value){
     paused=value;lastFrame=null;eggGame?.setPaused(value);finale?.setPaused(value);pepperGame?.setPaused(value);
     animations.forEach(animation=>{if(!animation.completed) {if(paused)animation.pause();else animation.resume();}});
-    controls.enabled=!paused&&(!busy||Boolean(eggGame?.active));
+    controls.enabled=!paused&&!windowFraming&&(!busy||Boolean(eggGame?.active));
   }
   onPlaybackRateChange(rate=>animations.forEach(animation=>{animation.speed=rate;}));
-  renderer.setAnimationLoop(time=>{const delta=lastFrame===null?0:(time-lastFrame)*getPlaybackRate();lastFrame=time;if(document.hidden||paused||finale?.active||pepperGame?.active)return;if(eggGame?.active){controls.update();eggGame.update(delta);if(eggGame.active)renderer.render(scene,camera);return;}animationTime+=delta;const t=animationTime/1000;royal.update(t,reduced.matches);if(!reduced.matches){const beat=Math.max(0,Math.sin(t*2.3));if(isWrapped()&&!busy){gift.rotation.z=Math.sin(t*9)*beat**8*.07;gift.position.y=beat**16*.12;gift.scale.set(1+beat**16*.04,1-beat**16*.035,1);}topStar.rotation.y=.3+Math.sin(t)*.18;lights.forEach((l,i)=>l.scale.setScalar(.88+Math.sin(t*2+i)*.15));}else if(isWrapped()&&!busy){gift.position.y=0;gift.rotation.z=0;gift.scale.setScalar(1);}if(busy){camera.lookAt(look);}else controls.update();updateGlobe();positionGiftFocus();renderer.render(renderScene,camera);});
-  return {open,fall,startPepperGame,stopPepperGame,reset,revealGlobe,returnToRoom,playArrival,finishArrival,setPaused,startEggGame,stopEggGame,helpEggGame(){eggGame?.help();},startFinale,stopFinale,setFinaleSound(value){finale?.setSound(value);},get busy(){return busy;}};
+  renderer.setAnimationLoop(time=>{const delta=lastFrame===null?0:(time-lastFrame)*getPlaybackRate();lastFrame=time;if(document.hidden||paused||finale?.active||pepperGame?.active)return;if(eggGame?.active){animationTime+=delta;updateCurtains(animationTime/1000);if(windowFraming)camera.lookAt(controls.target);else controls.update();eggGame.update(delta);updateWindowButton();if(eggGame.active)renderer.render(scene,camera);return;}animationTime+=delta;const t=animationTime/1000;updateCurtains(t);updateWindowButton();arrivalDoor.update();royal.update(t,reduced.matches);if(!reduced.matches){const beat=Math.max(0,Math.sin(t*2.3));if(isWrapped()&&!busy){gift.rotation.z=Math.sin(t*9)*beat**8*.07;gift.position.y=beat**16*.12;gift.scale.set(1+beat**16*.04,1-beat**16*.035,1);}topStar.rotation.y=.3+Math.sin(t)*.18;lights.forEach((l,i)=>l.scale.setScalar(.88+Math.sin(t*2+i)*.15));}else if(isWrapped()&&!busy){gift.position.y=0;gift.rotation.z=0;gift.scale.setScalar(1);}if(windowFraming){camera.lookAt(controls.target);}else if(busy){camera.lookAt(look);}else controls.update();updateGlobe();updateCameraPackage();positionGiftFocus();renderer.render(renderScene,camera);});
+  return {revealCameraPackage,openCameraPackage,hideCameraPackage,open,prepareWindow,fall,startPepperGame,stopPepperGame,reset,revealGlobe,returnToRoom,playArrival,finishArrival,setPaused,startEggGame,stopEggGame,helpEggGame(){eggGame?.help();},startFinale,stopFinale,setFinaleSound(value){finale?.setSound(value);},get busy(){return busy;}};
 }

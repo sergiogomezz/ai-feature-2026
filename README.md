@@ -36,3 +36,9 @@ La [skill del proyecto](.agents/skills/regalo-maria/SKILL.md), también disponib
 - [Estado, verificación y siguientes pasos](.agents/skills/regalo-maria/references/estado.md).
 
 - [Arquitectura y guía de animación](.agents/skills/regalo-maria/references/arquitectura.md).
+
+## Fotomatón independiente
+
+El tercer minijuego está integrado después del pimiento: paquete → cámara → cinco gestos → bola del mundo. El código compartido vive en [`minigames/photobooth/`](minigames/photobooth/README.md).
+
+Para retocarlo sin recorrer la aventura: `npm run dev:camera` y abrir http://127.0.0.1:4175/camera.html. Para revisar el paquete: http://127.0.0.1:4175/?preview=camera. La web completa sigue en http://127.0.0.1:4174/. Ambas entradas usan el mismo módulo; no hay una copia separada que sincronizar.

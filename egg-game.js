@@ -25,7 +25,7 @@ export function createEggGame({canvas, container, reduced, scene, camera, focusT
   });
   portrait.colorSpace = THREE.SRGBColorSpace;
   const faceMaterial = new THREE.MeshBasicMaterial({map: portrait, transparent: true, alphaTest: .25, side: THREE.DoubleSide, toneMapped: false});
-  const positions = [[-3, 3.75, -2.96], [3, 3.65, -2.77], [.5, 5.3, -3.12], [-5, 2.65, -3.22], [5.7, 2.7, -3.12]];
+  const positions = [[-3, 3.75, -2.96], [-5.5, 1.05, -3.12], [.5, 5.3, -3.12], [-5, 2.65, -3.22], [5.7, 2.7, -3.12]];
   const targets = positions.map((position, i) => {
     const group = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 1.38), faceMaterial);
     group.position.set(...position); group.name = `maria-face-${i + 1}`; root.add(group);
@@ -57,7 +57,7 @@ export function createEggGame({canvas, container, reduced, scene, camera, focusT
   const thumb = new THREE.Mesh(new THREE.CapsuleGeometry(.046, .14, 5, 12), skin); thumb.position.set(-.17, .04, .075); thumb.rotation.z = -.8; hand.add(thumb);
   const heldEgg = new THREE.Mesh(eggGeometry, eggMat); heldEgg.position.set(0, .23, .1); heldEgg.scale.set(.85, 1.22, .85); hand.add(heldEgg);
   hand.scale.setScalar(.48); hand.visible = false;
-  let active = false, paused = false, elapsed = 0, finishAt = null, onHit, onComplete;
+  let active = false, paused = false, elapsed = 0, finishAt = null, onHit, onImpact, onComplete;
   let shots = [], stains = [], serial = 0, lastWindup = -1000, pointerStart, projectionKey = '';
   const ray = new THREE.Raycaster(), pointer = new THREE.Vector2();
   function visible(object) { for(let p = object; p; p = p.parent)if(!p.visible)return false; return true; }
@@ -120,6 +120,7 @@ export function createEggGame({canvas, container, reduced, scene, camera, focusT
     stain.geometries.forEach(geometry => geometry.dispose());
   }
   function impact({point, normal, target}) {
+    onImpact?.();
     if (target && !target.hit) {
       target.hit = true; target.button.dataset.hit = 'true';
       target.button.setAttribute('aria-label', `Cara ${targets.indexOf(target) + 1} acertada. Lanzar otro huevo`);
@@ -232,20 +233,20 @@ export function createEggGame({canvas, container, reduced, scene, camera, focusT
   }
   function start(callbacks) {
     stop();projectionKey='';active=true;root.visible=true;hand.visible=true;elapsed=0;serial=0;lastWindup=-1000;
-    onHit=callbacks.onHit;onComplete=callbacks.onComplete;
+    onHit=callbacks.onHit;onImpact=callbacks.onImpact;onComplete=callbacks.onComplete;
     targets.forEach((t,i)=>{t.hit=false;delete t.button.dataset.hit;t.button.setAttribute('aria-pressed','false');t.button.setAttribute('aria-label',`Lanzar a la cara ${i+1} de María`);});
     overlay.hidden=false;document.documentElement.classList.remove('cucumber-moving','cucumber-hover');document.documentElement.classList.add('egg-aim');
     resize();updateHand();
     const first=targets.find(t=>!t.button.classList.contains('egg-target-away'))||targets[0];first.button.focus({preventScroll:true});
   }
-  return {start,stop,update(delta){update(delta);if(active)resize();},resize,setPaused(value){paused=value;},help(){
+  return {start,stop,settle(){hand.visible=false;overlay.hidden=true;document.documentElement.classList.remove('egg-aim');},update(delta){update(delta);if(active)resize();},resize,setPaused(value){paused=value;},help(){
     const next=targets.find(t=>!t.hit);if(!next)return;
     focusTarget(next.group.position);resize();overlay.classList.add('help');next.button.focus({preventScroll:true});
   },get active(){return active;}};
 }
 
 // Keyboard/touch-accessible version when WebGL is unavailable.
-export function createEggFallback({reduced, onHit, onComplete, wait, isPaused}) {
+export function createEggFallback({reduced, onHit, onImpact, onComplete, wait, isPaused}) {
   const overlay = document.getElementById('egg-game');
   const targetsUI = overlay.querySelector('.egg-targets');
   let active = true, count = 0;
@@ -257,6 +258,7 @@ export function createEggFallback({reduced, onHit, onComplete, wait, isPaused}) 
     const button = document.createElement('button'); button.className = 'egg-target'; button.style.backgroundImage = "url('/maria-head-cutout.png')"; button.setAttribute('aria-label', `Lanzar un huevo a la cara ${i + 1} de María`);
     button.addEventListener('click', async event => {
       if (!active || isPaused()) return;
+      onImpact?.();
       const stain = document.createElement('span'); stain.className = 'egg-fallback-splat'; stain.setAttribute('aria-hidden', 'true');
       const r = button.getBoundingClientRect(), box = overlay.getBoundingClientRect();
       Object.assign(stain.style, {left: `${r.left - box.left + r.width / 2}px`, top: `${r.top - box.top + r.height / 2}px`});
@@ -269,5 +271,5 @@ export function createEggFallback({reduced, onHit, onComplete, wait, isPaused}) 
     targetsUI.append(button);
   }
   targetsUI.firstElementChild.focus({preventScroll: true});
-  return {stop() {active = false; overlay.hidden = true; overlay.classList.remove('egg-fallback', 'help'); targetsUI.replaceChildren(); stains.forEach(s => s.remove()); document.documentElement.classList.remove('egg-aim');}, help() {overlay.classList.add('help'); targetsUI.querySelector(':not([data-hit])')?.focus();}};
+  return {settle(){active=false;targetsUI.querySelectorAll('button').forEach(button=>button.disabled=true);document.documentElement.classList.remove('egg-aim');},stop() {active = false; overlay.hidden = true; overlay.classList.remove('egg-fallback', 'help'); targetsUI.replaceChildren(); stains.forEach(s => s.remove()); document.documentElement.classList.remove('egg-aim');}, help() {overlay.classList.add('help'); targetsUI.querySelector(':not([data-hit])')?.focus();}};
 }

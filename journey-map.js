@@ -37,5 +37,5 @@ export function createJourneyMap(overlay){
     layer.dataset.span=String(Math.round(viewSpan));layer.dataset.level=String(base);
     return ready;
   }
-  reset();return {update,reset,hide(){layer.style.opacity='0';}};
+  reset();return {update,reset,element:layer,hide(){layer.style.opacity='0';}};
 }

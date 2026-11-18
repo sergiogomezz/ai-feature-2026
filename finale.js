@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { getPlaybackRate, onPlaybackRateChange } from './playback.js';
 import { createJourneyMap } from './journey-map.js';
+import { createPalauArrival } from './palau-arrival.js';
 
 const clamp = value => Math.max(0, Math.min(1, value));
 const smooth = value => {const t=clamp(value);return t*t*(3-2*t);};
@@ -9,11 +10,14 @@ export function createFinale({renderer, container, reduced, onReveal, onSpeaking
   const overlay=document.getElementById('finale');
   const phaseLabel=document.getElementById('journey-label');
   const map=createJourneyMap(overlay);
-  const journeyEnd=28500;
+  const aerialDuration=32000,journeyEnd=22500+aerialDuration;
+  const filmSpeed=1,stageIntro=2500,deliveryHold=3500;
   const aerial=document.getElementById('journey-aerial');
   const stage=document.getElementById('ending-stage');
   const film=document.getElementById('ending-film');
-  onPlaybackRateChange(rate=>{film.playbackRate=rate;});
+  onPlaybackRateChange(rate=>{film.playbackRate=rate*filmSpeed;});
+  const arrival=createPalauArrival();
+  const arrivalCanvas=document.createElement('canvas');arrivalCanvas.className='journey-aerial';arrivalCanvas.hidden=true;arrivalCanvas.setAttribute('aria-hidden','true');overlay.append(arrivalCanvas);
   const play=document.getElementById('ending-play');
   const tickets=document.getElementById('ending-tickets');
   const scene=new THREE.Scene();scene.background=new THREE.Color('#01040b');
@@ -39,6 +43,7 @@ export function createFinale({renderer, container, reduced, onReveal, onSpeaking
 
 
   let active=false,paused=false,elapsed=0,last=null,raf=0,mode='earth',delivered=false,spoken=false;
+  let stageAt=0,filmStarted=false,filmEndedAt=null;
   const smallScene=!renderer;
   function resize(){const r=container.getBoundingClientRect();camera.aspect=r.width/r.height;camera.updateProjectionMatrix();if(active)update();}
   function setMode(next){if(mode===next)return;mode=next;overlay.dataset.phase=next;container.dataset.travel=`finale-${next}`;}
@@ -48,31 +53,43 @@ export function createFinale({renderer, container, reduced, onReveal, onSpeaking
     delivered=true;play.hidden=true;setMode('tickets');tickets.hidden=false;tickets.classList.add('arriving');film.classList.add('delivered');
     speaking(false);document.getElementById('replay-message').focus({preventScroll:true});onReveal();
   }
-  async function showStage(){
-    if(!active||mode==='stage'||mode==='tickets')return;
-    setMode('stage');aerial.hidden=true;stage.hidden=false;phaseLabel.textContent='';map.hide();
-    film.muted=!soundEnabled();film.currentTime=0;film.playbackRate=getPlaybackRate();play.textContent=film.error?'Continuar con el regalo':'Escuchar el mensaje ▶';play.hidden=!film.muted&&!film.error;speaking(!film.muted);
-    try{await film.play();if(paused||!active)film.pause();}catch{if(active){play.hidden=false;speaking(false);}}
+  async function beginFilm(){
+    if(!active||mode!=='stage'||paused||document.hidden)return;
+    filmStarted=true;filmEndedAt=null;
+    try{await film.play();if(paused||!active||mode!=='stage')film.pause();else speaking(!film.muted);}
+    catch{if(active){play.hidden=false;speaking(false);}}
   }
-  film.addEventListener('ended',reveal);
+  function showStage(){
+    if(!active||mode==='stage'||mode==='tickets')return;
+    setMode('stage');aerial.hidden=true;arrivalCanvas.hidden=true;stage.hidden=false;stage.style.opacity='1';phaseLabel.textContent='';map.hide();
+    stageAt=elapsed;filmStarted=false;filmEndedAt=null;film.pause();
+    film.muted=!soundEnabled();film.currentTime=0;film.playbackRate=getPlaybackRate()*filmSpeed;film.preservesPitch=true;
+    play.textContent=film.error?'Continuar con el regalo':'Escuchar el mensaje ▶';play.hidden=!film.muted&&!film.error;speaking(false);
+  }
+  film.addEventListener('ended',()=>{if(active&&mode==='stage'){filmEndedAt=elapsed;speaking(false);}});
   film.addEventListener('error',()=>{if(active&&mode==='stage'){play.hidden=false;play.textContent='Continuar con el regalo';}});
   film.addEventListener('volumechange',()=>{if(active&&mode==='stage')speaking(!film.muted&&!film.paused);});
   play.addEventListener('click',async()=>{
     if(paused)return;
     if(film.error){reveal();return;}
     if(!soundEnabled())document.getElementById('sound').click();
-    film.muted=false;film.currentTime=0;play.hidden=true;speaking(true);
-    try{await film.play();}catch{play.hidden=false;speaking(false);}
+    film.muted=false;film.currentTime=0;play.hidden=true;
+    await beginFilm();
   });
   document.getElementById('replay-message').addEventListener('click',async()=>{
     if(!active||paused)return;
-    delivered=false;tickets.hidden=true;film.classList.remove('delivered');setMode('stage');film.currentTime=0;if(!soundEnabled())document.getElementById('sound').click();film.muted=false;speaking(true);
-    try{await film.play();}catch{play.hidden=false;speaking(false);}
+    delivered=false;tickets.hidden=true;film.classList.remove('delivered');setMode('stage');film.currentTime=0;if(!soundEnabled())document.getElementById('sound').click();film.muted=false;play.hidden=true;
+    await beginFilm();
   });
   document.getElementById('show-tickets').addEventListener('click',()=>{if(!paused){film.pause();reveal();}});
   function update(){
-    if(mode==='stage'||mode==='tickets')return;
-    const t=reduced.matches?(elapsed<1000?0:elapsed<2200?22501:elapsed<3400?25000:journeyEnd+1):elapsed;
+    if(mode==='tickets')return;
+    if(mode==='stage'){
+      if(!filmStarted&&elapsed-stageAt>=stageIntro)beginFilm();
+      if(filmEndedAt!==null&&elapsed-filmEndedAt>=deliveryHold)reveal();
+      return;
+    }
+    const t=reduced.matches?(elapsed<1000?0:elapsed<2200?22501:elapsed<6500?30000:journeyEnd+1):elapsed;
     if(t<22500){
       const d=Math.max(12,3.7/(Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.aspect));
       const rotation=smooth(t/6500),approach=smooth((t-6500)/16000);
@@ -87,47 +104,49 @@ export function createFinale({renderer, container, reduced, onReveal, onSpeaking
       earth.quaternion.copy(earthOrientation).multiply(spin.setFromAxisAngle(spinAxis,Math.PI*4*(1-rotation)));
       camera.position.set(0,0,mapReady?3+Math.max(.03,altitude):Math.max(4.5,3+altitude));camera.lookAt(0,0,0);
       overlay.style.setProperty('--arrival-flash','0');
-      phaseLabel.textContent=t<6500?'':viewSpan>25000?'Barcelona':'Palau Sant Jordi';
+      phaseLabel.textContent='';
       overlay.dataset.turns=String(rotation*2);
       overlay.dataset.zoom=String(approach);
     }else if(t<journeyEnd){
-      setMode('palau');map.update(850,1);phaseLabel.textContent='Palau Sant Jordi';
-      const ready=aerial.complete&&aerial.naturalWidth>0;
-      const opacity=reduced.matches?1:smooth((t-22500)/1300);
-      const fit=Math.max(container.clientWidth/aerial.naturalWidth,container.clientHeight/aerial.naturalHeight);
-      const budget=Math.max(1,Math.min(1.28,1/fit));
-      const approach=reduced.matches?0:smooth((t-22500)/6000);
-      aerial.hidden=!ready;
-      aerial.style.opacity=String(opacity);
-      aerial.style.transform=`scale(${1+approach*(budget-1)})`;
-      if(ready&&opacity===1)map.hide();
+      setMode('palau');phaseLabel.textContent='';aerial.hidden=true;
+      const seconds=(t-22500)/1000;
+      const blend=reduced.matches?1:smooth(seconds/3);
+      map.update(850,1-blend);
+      map.element.style.transform=reduced.matches?'':`perspective(1200px) rotateX(${blend*28}deg) scale(${1+blend*.18})`;
+      if(blend===1)map.hide();
+      const entering=arrival.update(reduced.matches?32:seconds,camera.aspect,reduced.matches);
+      overlay.dataset.arrival=String(seconds);
+      stage.hidden=entering===0;stage.style.opacity=String(entering);
     }else{showStage();}
     overlay.style.setProperty('--travel-progress',String(clamp(t/journeyEnd)));
-    if(smallScene){overlay.classList.add('ending-fallback');overlay.style.setProperty('--earth-scale',String(1+smooth(t/6500)*3));}
+    if(smallScene){overlay.classList.add('ending-fallback');overlay.style.setProperty('--earth-scale',String(1+smooth(t/6500)*3));if(mode==='palau'){arrivalCanvas.hidden=false;arrivalCanvas.width=container.clientWidth;arrivalCanvas.height=container.clientHeight;arrival.drawFallback(arrivalCanvas);}}
+    else if(mode==='palau')renderer.render(arrival.scene,arrival.camera);
     else renderer.render(scene,camera);
   }
   function tick(now){
     if(!active)return;
-    const delta=last===null?0:Math.min(now-last,100);last=now;
+    // Static poster/end frames can be throttled by the browser; holds use real time.
+    const raw=last===null?0:Math.max(0,now-last);
+    const delta=mode==='stage'||mode==='tickets'?raw:Math.min(raw,100);last=now;
     if(!paused&&!document.hidden){elapsed+=delta*getPlaybackRate();update();}
     raf=requestAnimationFrame(tick);
   }
   function start(){
-    stop();active=true;elapsed=0;last=null;mode='';delivered=false;map.reset(reduced.matches);aerial.hidden=true;aerial.style.opacity='0';aerial.style.transform='scale(1)';overlay.hidden=false;stage.hidden=true;tickets.hidden=true;film.classList.remove('delivered');tickets.classList.remove('arriving');
+    stop();active=true;elapsed=0;last=null;mode='';delivered=false;map.reset(reduced.matches);aerial.hidden=true;aerial.style.opacity='0';aerial.style.transform='scale(1)';map.element.style.transform='';stage.style.opacity='1';overlay.hidden=false;stage.hidden=true;tickets.hidden=true;film.classList.remove('delivered');tickets.classList.remove('arriving');
     if(renderer)renderer.setPixelRatio(Math.min(devicePixelRatio,2.25));
     resize();setMode('earth');overlay.style.setProperty('--arrival-flash','0');
     // Prime media during the user's click; the actual performance begins after arrival.
     if(film.error)film.load();
-    film.muted=true;film.play().then(()=>{if(mode!=='stage')film.pause();}).catch(()=>{});
+    film.muted=true;film.play().then(()=>{if(mode!=='stage'||!filmStarted||paused||!active)film.pause();}).catch(()=>{});
     raf=requestAnimationFrame(tick);
   }
-  function stop(){if(renderer)renderer.setPixelRatio(originalPixelRatio);active=false;cancelAnimationFrame(raf);last=null;film.pause();film.currentTime=0;overlay.hidden=true;aerial.hidden=true;stage.hidden=true;tickets.hidden=true;map.hide();speaking(false);}
+  function stop(){if(renderer)renderer.setPixelRatio(originalPixelRatio);active=false;cancelAnimationFrame(raf);last=null;film.pause();film.currentTime=0;overlay.hidden=true;aerial.hidden=true;arrivalCanvas.hidden=true;stage.hidden=true;tickets.hidden=true;map.hide();speaking(false);}
   document.addEventListener('visibilitychange',()=>{
     last=null;
     if(!active||mode!=='stage')return;
     if(document.hidden){film.pause();speaking(false);}
-    else if(!paused&&!delivered)film.play().then(()=>{if(active&&mode==='stage')speaking(!film.muted);}).catch(()=>{if(active)play.hidden=false;});
+    else if(!paused&&!delivered&&filmStarted&&filmEndedAt===null)film.play().then(()=>{if(active&&mode==='stage')speaking(!film.muted);}).catch(()=>{if(active)play.hidden=false;});
   });
   const observer=new ResizeObserver(resize);observer.observe(container);resize();
-  return {start,stop,resize,setPaused(value){paused=value;last=null;if(!active)return;if(value){film.pause();speaking(false);}else if(mode==='stage'&&!delivered){film.play().then(()=>{if(active&&mode==='stage')speaking(!film.muted);else film.pause();}).catch(()=>{if(active)play.hidden=false;});}},setSound(value){film.muted=!value;if(active&&mode==='stage'){speaking(value&&!film.paused);if(!film.error)play.hidden=value&&!film.paused;}},get active(){return active;},get mode(){return mode;}};
+  return {start,stop,resize,setPaused(value){paused=value;last=null;if(!active)return;if(value){film.pause();speaking(false);}else if(mode==='stage'&&!delivered&&filmStarted&&filmEndedAt===null){film.play().then(()=>{if(active&&mode==='stage')speaking(!film.muted);else film.pause();}).catch(()=>{if(active)play.hidden=false;});}},setSound(value){film.muted=!value;if(active&&mode==='stage'){speaking(value&&!film.paused);if(!film.error)play.hidden=value&&!film.paused;}},get active(){return active;},get mode(){return mode;}};
 }

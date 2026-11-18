@@ -39,3 +39,11 @@ Resultado revisado: conserva dos tarjetas, mueve cabeza y expresión, y acerca u
 - Vistas 08–13: PNOA · IGN y comunidades autónomas, CC BY 4.0 scne.es. Capa de imagen `OI.OrthoimageCoverage` (no `OI.MosaicElement`, que solo devuelve delimitaciones/fechas). Servicio `https://www.ign.es/wms-inspire/pnoa-ma`. [Servicios PNOA](https://pnoa.ign.es/pnoa-imagen/visualizadores-y-servicios-web).
 
 Imágenes servidas desde el propio proyecto, atribución discreta visible durante el viaje, sin APIs de pago ni solicitudes de mapas mientras María juega. La foto aérea de ImageGen anterior reaparece tras el zoom geográfico, por corrección explícita del usuario (18 de noviembre). El MP4 y su voz no cambian.
+
+## Cartel en las tarjetas (18 de noviembre)
+
+`public/ending/quevedo-el-baifo-tour-2027.png`: cartel de 222×222 aportado por el usuario en el chat (Quevedo con cabra, banda naranja «El Baifo Tour 2027»), copiado sin alterar. Se muestra completo en las dos tarjetas de Sergio Gómez Martín y María Porras Agenjo; no procede de ImageGen ni de una búsqueda externa. Datos de evento/organizador transcritos de la segunda captura del usuario.
+
+## Nuevo audio incorporado (18 de noviembre, revisión posterior)
+
+El usuario pidió usar uno de los audios existentes en `output/`. Solo había `final_voice.wav`: 7,512 s, PCM16 mono 24 kHz. Se incorporó directamente a `public/ending/quevedo-message.mp4`, usando las imágenes de `quevedo-stage.mp4` estiradas a esa duración, H.264 CRF 19/AAC 160 kbps y faststart. No se ejecutó RVC, no se generó otra voz ni se descargaron modelos. El generador local ha sido modificado por el usuario desde el cierre anterior y ahora incluye conversión RVC; no tratar el WAV suministrado como la antigua voz original Eddy. En la interfaz se identifica genéricamente como audio generado con IA. La animación labial del vídeo anterior no se ha resintetizado. El vídeo y audio originales se conservan.

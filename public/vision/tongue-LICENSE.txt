@@ -1,0 +1,6 @@
+Tongue detector derived from face-lens (snakajima), student.onnx v1.
+https://huggingface.co/snakajima/face-lens/tree/v1
+Licensed CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
+Modification: extracted only the tongue output and its dependencies. All other prediction heads removed.
+Original model attribution retained in tongue-ATTRIBUTION.csv.
+Preprocessing follows https://github.com/receptron/face-lens (Apache-2.0).

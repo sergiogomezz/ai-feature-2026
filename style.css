@@ -18,14 +18,22 @@ html.cucumber-hover,html.cucumber-hover body,html.cucumber-hover body *{cursor:u
 html.cucumber-moving.cucumber-hover,html.cucumber-moving.cucumber-hover body,html.cucumber-moving.cucumber-hover body *{cursor:url('/pepino-scream-hover.svg') 11 9,pointer!important}
 }
 
-#christmas-envelope{position:fixed;inset:0;z-index:20;display:grid;place-content:center;background:radial-gradient(ellipse at 50% 45%,#314b41,#152720 75%);transition:opacity 1.2s ease-in-out}
+#christmas-envelope{position:fixed;inset:0;z-index:20;display:grid;place-content:center;background:radial-gradient(ellipse at 50% 45%,#314b41,#152720 75%);transition:opacity 1.2s ease-in-out;perspective:1000px;overflow:hidden}
 #christmas-envelope.leaving{opacity:0;pointer-events:none}
 .envelope{position:relative;width:min(78vw,440px);height:min(52vw,290px);border:0;background:none;filter:drop-shadow(0 22px 35px #0006);padding:0;isolation:isolate}
-.envelope:not(.opening){animation:envelope-shake 3.8s ease-in-out infinite;transform-origin:50% 65%}
+.envelope{animation:envelope-drop 3.2s both;transform-origin:50% 65%}
+.envelope:not(.opening){animation:envelope-drop 3.2s both,envelope-shake 3.8s 3.2s ease-in-out infinite}
+.envelope.flight-landed{animation:none}
+.envelope.flight-landed:not(.opening){animation:envelope-shake 3.8s ease-in-out infinite}
+.envelope.audio-flight,.envelope.audio-flight:not(.opening){animation:none;transform-origin:50% 50%;will-change:transform}
+@keyframes envelope-drop{0%{transform:translateY(calc(-100svh - 100%)) rotate(-12deg);animation-timing-function:cubic-bezier(.55,0,.9,.55)}68%{transform:translateY(18px) rotate(4deg);animation-timing-function:ease-out}83%{transform:translateY(-14px) rotate(-2deg);animation-timing-function:ease-in-out}94%{transform:translateY(4px) rotate(1deg);animation-timing-function:ease-out}100%{transform:translateY(0) rotate(0)}}
 @keyframes envelope-shake{0%,35%,75%,100%{transform:translateY(0) rotate(0)}42%{transform:translateY(-4px) rotate(-4deg)}49%{transform:translateY(-6px) rotate(4deg)}56%{transform:translateY(-4px) rotate(-3deg)}63%{transform:translateY(-2px) rotate(2deg)}70%{transform:translateY(0) rotate(-1deg)}}
 .envelope-back{position:absolute;inset:0;z-index:0;background:#d5c5a3;border-radius:8px}
 .envelope-letter{position:absolute;z-index:2;inset:10px 20px 15px;background:#fff4da;display:flex;align-items:center;flex-direction:column;justify-content:flex-start;padding-top:28px;border:1px solid #d6bf91;border-radius:5px;color:#365343;font:inherit;transition:transform 1.8s ease-in-out}
 .envelope-letter>span{font:italic clamp(25px,6vw,42px) Georgia,serif;color:#365343;white-space:nowrap}.envelope-letter small{font-size:26px;color:#bc924e;margin-top:13px}
+.envelope-letter-action{display:grid;place-items:center;width:40px;height:36px;margin-top:12px;border:1px solid #365343;border-radius:50%;background:#365343;color:#fff4da;flex-shrink:0}
+.envelope-letter-action svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.envelope.card-ready .envelope-letter:hover .envelope-letter-action{background:#243e30}
 .envelope-front{position:absolute;inset:0;z-index:3;background:linear-gradient(135deg,#f3e2be,#d9c49c);clip-path:polygon(0 0,50% 52%,100% 0,100% 100%,0 100%);border-radius:6px}
 .envelope-flap{position:absolute;inset:0;z-index:4;background:#e9d4ab;clip-path:polygon(0 0,100% 0,50% 56%);transform-origin:top;transition:transform 1.5s ease-in-out,z-index 0s .75s}
 .envelope-seal{position:absolute;z-index:5;left:calc(50% - 24px);top:43%;width:48px;height:48px;display:grid;place-items:center;border-radius:50%;background:#91453b;border:3px double #bc7764;color:#e7ba84;font-size:25px;box-shadow:0 3px 6px #0004;transition:opacity .5s}
@@ -88,46 +96,72 @@ html.egg-aim,html.egg-aim body,html.egg-aim body *{cursor:url('/egg-hand.svg') 2
 #ending-stage{position:absolute;inset:0;pointer-events:auto;background:#03080e;animation:stage-appear .9s ease both;overflow:hidden}
 #ending-film{width:100%;height:100%;object-fit:contain;background:#03080e;transition:filter 1.4s,transform 1.4s}
 #ending-film.delivered{filter:brightness(.25) blur(7px);transform:scale(1.06)}
-.ending-disclosure{position:absolute;z-index:2;left:20px;bottom:15px;font-size:10px;letter-spacing:.3px;color:#fff9;background:#0c1116aa;padding:6px 9px;border-radius:3px;margin:0}
-.ending-subtitle{position:absolute;bottom:78px;left:22px;right:22px;text-align:center;font:italic clamp(21px,3vw,33px) Georgia,serif;text-shadow:0 2px 14px #000,0 2px 4px #000;background:linear-gradient(transparent,#03080e88);padding:15px}
+
+
 .ending-skip,.ending-replay{border:0;border-bottom:1px solid #e4c68a66;color:#e4c68a;background:transparent;padding:10px 0;font-size:12px;letter-spacing:.3px}
 .ending-skip{position:absolute;bottom:18px;right:24px}
 .ending-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:14px 22px;border:1px solid #e4c68a;border-radius:30px;background:#142029df;color:#fff1cf;white-space:nowrap;box-shadow:0 4px 30px #0006}
 .ending-play span{margin-left:15px}
-#ending-tickets{position:absolute;inset:0;z-index:3;pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:70px 22px 45px;background:radial-gradient(ellipse at 50% 42%,#10232966,#02080dc9);overflow:auto;animation:stage-appear 1.2s ease both}
-.ticket-intro{text-align:center;margin-bottom:26px}
-.ticket-intro>span{font-size:10px;letter-spacing:4px;color:#e4c68a}
-.ticket-intro h2{font:italic clamp(35px,4.5vw,56px)/1.05 Georgia,serif;margin:15px 0;color:#fff1cf;font-weight:normal;letter-spacing:-1.3px}
-.ticket-intro>p{font-size:13px;color:#cccfbf;margin:16px 0 0}
-.ticket-pair{display:flex;gap:24px;justify-content:center;align-items:center;max-width:100%;padding:10px}
-.concert-ticket{position:relative;display:flex;width:min(35vw,410px);min-height:155px;background:#f7eccd;color:#26392e;border-radius:4px;filter:drop-shadow(0 15px 25px #0005);transform:rotate(-5deg);overflow:hidden;isolation:isolate}
-.concert-ticket:nth-child(2){transform:rotate(5deg) translateY(10px)}
-.concert-ticket:before,.concert-ticket:after{content:'';position:absolute;z-index:2;right:calc(19% - 7px);width:14px;height:14px;border-radius:50%;background:#112028}
-.concert-ticket:before{top:-7px}.concert-ticket:after{bottom:-7px}
-.ticket-main{padding:27px 22px;width:81%;background:radial-gradient(circle at 0 0,#c3a86c33 1px,transparent 1px);background-size:5px 5px}
-.ticket-type{font-size:9px;letter-spacing:3px;font-weight:bold;color:#6c7759}
-.ticket-main h3{font:bold clamp(22px,3vw,37px)/1 'Trebuchet MS',sans-serif;letter-spacing:2px;margin:12px 0 13px;color:#293b2c}
-.ticket-main p{font-size:12px;margin:0;white-space:nowrap}
-.ticket-stub{width:19%;border-left:1px dashed #88947488;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:15px;background:#e6d7b1}
-.ticket-stub>span{font:italic 26px Georgia,serif;color:#69764f}.ticket-stub small{font-size:7px;letter-spacing:2px;writing-mode:vertical-rl}
-.ticket-actions{text-align:center;margin-top:30px}
-.ticket-venue{font-size:13px;color:#ebd7ab;letter-spacing:1px;margin:0 0 10px}
-.ticket-note{font-size:10px;line-height:1.6;color:#b9c2b7;margin:0 0 12px}
-#finale[data-phase=tickets] .ending-subtitle,#finale[data-phase=tickets] .ending-skip{display:none}
-#ending-tickets.arriving .concert-ticket{animation:ticket-hand-off 1.25s cubic-bezier(.18,.75,.2,1) both}
-#ending-tickets.arriving .concert-ticket:nth-child(2){animation-delay:.2s}
+#ending-tickets{position:absolute;inset:0;z-index:3;pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 24px 28px;background:radial-gradient(ellipse at 50% 35%,#173c49eb,#040e17f5 80%);overflow:auto;animation:stage-appear 1.2s ease both}
+.ticket-intro{text-align:center;margin-bottom:22px}
+.ticket-intro h2{font:italic clamp(30px,3.8vw,46px)/1.1 Georgia,serif;margin:0;color:#fff1cf;font-weight:normal;letter-spacing:-1.1px}
+.ticket-pair{display:flex;flex-direction:column;gap:22px;align-items:center;width:100%;max-width:800px;padding:5px 10px;flex-shrink:0}
+.concert-ticket{position:relative;display:grid;grid-template-columns:190px minmax(0,1fr) 65px;width:min(100%,760px);min-height:208px;background:#fff1d5;color:#142f43;border-radius:6px;filter:drop-shadow(0 14px 22px #0005);transform:rotate(-1.8deg);overflow:hidden;isolation:isolate}
+.concert-ticket:nth-child(2){transform:rotate(1.8deg)}
+.concert-ticket:before,.concert-ticket:after{content:'';position:absolute;z-index:2;right:56px;width:18px;height:18px;border-radius:50%;background:#0b1d28}
+.concert-ticket:before{top:-9px}.concert-ticket:after{bottom:-9px}
+.ticket-art{display:grid;place-items:center;background:#205a76;overflow:hidden}
+.ticket-art img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:contain}
+.ticket-main{min-width:0;padding:19px 25px 16px;background:radial-gradient(#bb8c4a19 .65px,transparent .8px) 0 0/5px 5px}
+.ticket-tour{display:flex;align-items:center;justify-content:space-between;font-size:10px;line-height:1;letter-spacing:2.5px;font-weight:800;color:#b54924}
+.ticket-tour>span{letter-spacing:1px}
+.ticket-main h3{font:900 clamp(30px,3.5vw,45px)/1 'Arial Black','Trebuchet MS',sans-serif;letter-spacing:-2px;margin:8px 0 13px;color:#11384f}
+.ticket-holder{display:flex;flex-direction:column;gap:4px;padding-bottom:12px;margin-bottom:11px;border-bottom:1px solid #173f4926}
+.ticket-holder>span{font-size:8px;letter-spacing:2.4px;color:#7b776c;font-weight:700}
+.ticket-holder strong{font-size:19px;line-height:1.15;font-weight:800;letter-spacing:-.35px}
+.ticket-event{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:12px;line-height:1.3}
+.ticket-event>strong{font-size:15px;white-space:nowrap;color:#b74724}
+.ticket-location{font-size:13px;font-weight:800;margin:8px 0 0;line-height:1.3}
+.ticket-location>span{font-size:11px;font-weight:400;margin-left:8px;color:#65717a}
+.ticket-stub{border-left:1px dashed #753b3270;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;background:#e95527;color:#fff1d5}
+.ticket-stub>span{font:900 23px/1 'Arial Black',sans-serif;writing-mode:vertical-rl;letter-spacing:1px}
+.ticket-stub small{font-size:8px;letter-spacing:2.5px;writing-mode:vertical-rl;font-weight:800}
+.ticket-actions{text-align:center;margin-top:23px;max-width:760px;flex-shrink:0}
+
+
+
+.ticket-actions .ending-replay{font-size:11px;padding:8px 0}
+#finale[data-phase=tickets] .ending-skip{display:none}
+#ending-tickets.arriving .concert-ticket{animation:ticket-hand-off 2s cubic-bezier(.18,.75,.2,1) both}
+#ending-tickets.arriving .concert-ticket:nth-child(2){animation-delay:.6s}
 .ending-fallback{background:#01040b url('/ending/earth.jpg') center/cover}
 .ending-fallback[data-phase=city],.ending-fallback[data-phase=palau]{background:radial-gradient(ellipse at 50% 55%,#77917e,#1b3035)}
 @keyframes stage-appear{from{opacity:0}to{opacity:1}}
 @keyframes ticket-hand-off{from{opacity:0;translate:0 130px;scale:.55}to{opacity:1;translate:0 0;scale:1}}
-@media(max-width:700px){.ticket-intro{margin-bottom:20px}.ticket-pair{flex-direction:column;gap:19px}.concert-ticket{width:min(82vw,350px);min-height:127px}.concert-ticket:nth-child(2){transform:rotate(3deg)}.ticket-main{padding:22px 20px}.ticket-main h3{font-size:29px;margin:10px 0}.ticket-main p{font-size:11px}.ticket-intro h2{font-size:36px}.ticket-intro>p{font-size:12px}.ticket-actions{margin-top:24px}#ending-film{object-fit:cover;object-position:50% 40%}.ending-subtitle{bottom:110px;font-size:23px}.ending-disclosure{font-size:9px;left:12px;bottom:16px}.ending-skip{bottom:40px;right:18px}#ending-tickets{padding:75px 18px 30px;justify-content:safe center}}
-@media(max-height:700px){.ticket-intro h2{font-size:30px}.ticket-intro{margin-bottom:10px}.ticket-actions{margin-top:18px}.concert-ticket{min-height:115px}.ticket-main{padding:18px}.ticket-pair{gap:13px}}
+@media(max-width:700px){
+  #ending-tickets{padding:73px 17px 26px;justify-content:safe center}
+  .ticket-intro{margin-bottom:20px}.ticket-intro h2{font-size:33px;max-width:340px}
+  .ticket-pair{padding:4px 5px;gap:20px}
+  .concert-ticket{grid-template-columns:94px minmax(0,1fr) 28px;min-height:222px;transform:rotate(-1deg)}
+  .concert-ticket:nth-child(2){transform:rotate(1deg)}
+  .concert-ticket:before,.concert-ticket:after{right:21px;width:14px;height:14px}.concert-ticket:before{top:-7px}.concert-ticket:after{bottom:-7px}
+  .ticket-main{padding:17px 13px 16px}.ticket-tour{font-size:8px;letter-spacing:1px}.ticket-tour>span{font-size:8px}
+  .ticket-main h3{font-size:29px;letter-spacing:-1.5px;margin:10px 0 14px}
+  .ticket-holder{gap:5px;padding-bottom:12px;margin-bottom:11px}.ticket-holder strong{font-size:16px;line-height:1.2}
+  .ticket-event{flex-wrap:wrap;gap:4px;font-size:10px}.ticket-event>strong{font-size:13px}
+  .ticket-location{font-size:12px;margin-top:8px}.ticket-location>span{display:block;margin:2px 0 0;font-size:10px}
+  .ticket-stub{gap:17px}.ticket-stub>span{font-size:16px}.ticket-stub small{font-size:6px;letter-spacing:1.5px}
+  .ticket-actions{margin-top:22px}
+  #ending-film{object-fit:cover;object-position:50% 40%}.ending-skip{bottom:40px;right:18px}
+}
+@media(max-height:740px){#ending-tickets{justify-content:safe center;padding-top:66px}.ticket-intro{margin-bottom:16px}.ticket-intro h2{font-size:28px}.ticket-actions{margin-top:18px}}
+@media(max-width:360px){.concert-ticket{grid-template-columns:76px minmax(0,1fr) 24px}.concert-ticket:before,.concert-ticket:after{right:17px}.ticket-main h3{font-size:27px}.ticket-holder strong{font-size:15px}}
 .journey-aerial{z-index:1;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 55%;transform-origin:50% 55%;will-change:transform}
 .tree-globe-control{position:absolute;z-index:4;transform:translate(-50%,-50%);border:0;border-radius:50%;background:transparent;padding:0;touch-action:manipulation}
 .tree-globe-control:focus-visible{outline:2px dashed #c8efff;outline-offset:7px;box-shadow:0 0 30px #96dfff88}
 .tree-globe-control.globe-fallback{left:calc(50% + 65px);top:43%;width:72px;height:72px;background:#0e3158 url('/ending/earth.jpg') center/cover;border:2px solid #b1e4ff;box-shadow:0 0 16px #b1e4ff,0 0 45px #84c9ff88}
-.journey-source{position:absolute;left:12px;bottom:14px;font-size:9px;color:#c5d1df99;pointer-events:auto}
-#finale[data-phase=stage] .journey-source,#finale[data-phase=tickets] .journey-source{display:none}
+
+
 
 /* A little flight above the winter clouds. Gameplay stays usable without WebGL. */
 .pepper-game{position:absolute;inset:0;z-index:7;color:#29444a;isolation:isolate}
@@ -151,17 +185,33 @@ html.egg-aim,html.egg-aim body,html.egg-aim body *{cursor:url('/egg-hand.svg') 2
 .pepper-fallback{display:none;position:absolute;inset:0;pointer-events:none;z-index:-1}
 .pepper-no-webgl{background:linear-gradient(#9bc8d7,#d7e7df 75%,#f4e9d0)}
 .pepper-no-webgl .pepper-fallback{display:block}
-.pepper-vegetable{position:absolute;transform:translate(-50%,-50%) rotate(-35deg);font-size:65px;filter:drop-shadow(3px 5px 5px #527f8766)}
+.pepper-vegetable{position:absolute;transform:translate(-50%,-50%);width:100px;height:120px;filter:drop-shadow(3px 5px 5px #527f8766)}.pepper-vegetable svg{width:100%;height:100%}
 .pepper-hoop{position:absolute;transform:translate(-50%,-50%);border:7px solid #e6b753;border-radius:50%;box-shadow:inset 2px 0 3px #fff5cc,2px 0 3px #fff5cc}
 @media(max-width:600px){.pepper-heading{top:85px}.pepper-heading>span{font-size:9px;letter-spacing:2px}.pepper-heading h2{font-size:31px;letter-spacing:-1px}.pepper-heading p{font-size:12px}.pepper-ready{bottom:25%}.pepper-footer{bottom:35px}}
 
 .journey-map{z-index:0;position:absolute;inset:0;overflow:hidden;opacity:0;pointer-events:none}
 .journey-map img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:none;object-fit:fill}
-.journey-source{max-width:calc(100% - 24px);font-size:8px;line-height:1.5;text-shadow:0 1px 3px #000;background:#07121b88;padding:3px 5px;border-radius:3px}
-.journey-source a{color:inherit;text-decoration:none}
+
+
 .journey-copy>span{letter-spacing:1px;font-size:14px}
 .pepper-finished .primary{margin-top:30px}
 
-.journey-source{z-index:2}.journey-line{z-index:1}
+.journey-line{z-index:1}
 
 .controls #speed{font-size:15px;font-weight:800;letter-spacing:-.5px}
+
+.window-jump{position:absolute;z-index:6;display:grid;place-items:center;border:0;border-radius:12px;background:transparent;color:#fff4ce;cursor:pointer;box-shadow:inset 0 0 28px #b8e8ed44;touch-action:manipulation}
+.window-jump>span{display:grid;place-items:center;width:44px;height:44px;border:1px solid #fff4ceaa;border-radius:50%;background:#365c58a8;font-size:27px;box-shadow:0 0 28px #e5f9d888}
+.window-jump:hover>span{background:#365c58}
+.window-jump.window-offscreen,.window-jump.window-fallback{left:auto!important;top:auto!important;right:24px;bottom:95px;width:80px!important;height:90px!important;background:#6ca2a6a8;border:3px solid #fff1cc}
+
+.pepper-game[data-impact=true] .pepper-score{background:#ffe5bd;color:#8d3b23;box-shadow:0 0 25px #f19b4477}
+
+/* Arrival is blended by the shared, pausable camera clock. */
+#ending-stage{animation:none}
+.journey-copy,.journey-line{display:none}
+.journey-map{transform-origin:50% 50%;will-change:transform,opacity}
+
+#ending-stage{z-index:2}
+
+.face-package-button{position:absolute;z-index:8;border:2px solid #efcf83;border-radius:50%;background:#32483ed9;color:#ffe5a5;width:56px;height:56px;font-size:27px;box-shadow:0 0 25px #efd38c66;transform:translate(-50%,-50%)}
